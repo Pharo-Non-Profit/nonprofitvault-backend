@@ -1,0 +1,100 @@
+# HOW TO USE:
+# $ docker-compose -p nonprofitvault -f docker-compose.yml up   #
+#
+
+version: '3.8'
+services:
+  caddy:
+    container_name: nonprofitvault_backend_caddy
+    image: 'caddy:2-alpine'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - '$PWD/Caddyfile:/etc/caddy/Caddyfile'
+      - 'caddy_data:/data'
+      - 'caddy_config:/config'
+    networks:
+      - web
+      - caddy_internal
+
+  # The purpose of this service is to store our application data.
+  db:
+    container_name: nonprofitvault_mongodb
+    image: mongo:6.0.5-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    restart: unless-stopped
+    logging:
+      driver: none
+    networks:
+      - caddy_internal
+
+  # The main application.
+  app:
+    container_name: nonprofitvault_backend_app
+    image: 'Pharo-Non-Profit/nonprofitvault-backend:latest'
+    stdin_open: true
+    restart: unless-stopped
+    environment:
+        NONPROFITVAULT_BACKEND_IP: 0.0.0.0
+        NONPROFITVAULT_BACKEND_PORT: 8000
+        NONPROFITVAULT_BACKEND_HMAC_SECRET: ${NONPROFITVAULT_BACKEND_HMAC_SECRET}
+        NONPROFITVAULT_BACKEND_HAS_DEBUGGING: ${NONPROFITVAULT_BACKEND_HAS_DEBUGGING}
+        NONPROFITVAULT_BACKEND_DB_URI: ${NONPROFITVAULT_BACKEND_DB_URI}
+        NONPROFITVAULT_BACKEND_DB_NAME: ${NONPROFITVAULT_BACKEND_DB_NAME}
+        NONPROFITVAULT_BACKEND_CACHE_URI: ${NONPROFITVAULT_BACKEND_CACHE_URI}
+        NONPROFITVAULT_BACKEND_CACHE_PASSWORD: ${NONPROFITVAULT_BACKEND_CACHE_PASSWORD}
+        NONPROFITVAULT_BACKEND_AWS_ACCESS_KEY: ${NONPROFITVAULT_BACKEND_AWS_ACCESS_KEY}
+        NONPROFITVAULT_BACKEND_AWS_SECRET_KEY: ${NONPROFITVAULT_BACKEND_AWS_SECRET_KEY}
+        NONPROFITVAULT_BACKEND_AWS_ENDPOINT: ${NONPROFITVAULT_BACKEND_AWS_ENDPOINT}
+        NONPROFITVAULT_BACKEND_AWS_REGION: ${NONPROFITVAULT_BACKEND_AWS_REGION}
+        NONPROFITVAULT_BACKEND_AWS_BUCKET_NAME: ${NONPROFITVAULT_BACKEND_AWS_BUCKET_NAME}
+        NONPROFITVAULT_BACKEND_AWS_SSE_CUSTOMER_KEY: ${NONPROFITVAULT_BACKEND_AWS_SSE_CUSTOMER_KEY}
+        NONPROFITVAULT_BACKEND_INITIAL_ADMIN_EMAIL: ${NONPROFITVAULT_BACKEND_INITIAL_ADMIN_EMAIL} # Required email for root admin when project starts up
+        NONPROFITVAULT_BACKEND_INITIAL_ADMIN_PASSWORD: ${NONPROFITVAULT_BACKEND_INITIAL_ADMIN_PASSWORD} # Required password for root admin when project starts up
+        NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_ID: ${NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_ID}
+        NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_NAME: ${NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_NAME}
+        NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_OPENAI_KEY: ${NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_OPENAI_KEY}
+        NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_OPENAI_ORGANIZATION_KEY: ${NONPROFITVAULT_BACKEND_INITIAL_ADMIN_STORE_OPENAI_ORGANIZATION_KEY}
+        NONPROFITVAULT_BACKEND_DOMAIN_NAME: ${NONPROFITVAULT_BACKEND_DOMAIN_NAME}
+        AWS_ACCESS_KEY: ${NONPROFITVAULT_BACKEND_AWS_ACCESS_KEY} # AWS SDK requires this exact name.
+        AWS_SECRET_KEY: ${NONPROFITVAULT_BACKEND_AWS_SECRET_KEY} # AWS SDK requires this exact name.
+        AWS_REGION: ${NONPROFITVAULT_BACKEND_AWS_REGION}         # AWS SDK requires this exact name.
+        NONPROFITVAULT_BACKEND_MAILGUN_API_KEY: ${NONPROFITVAULT_BACKEND_MAILGUN_API_KEY}
+        NONPROFITVAULT_BACKEND_MAILGUN_DOMAIN: ${NONPROFITVAULT_BACKEND_MAILGUN_DOMAIN}
+        NONPROFITVAULT_BACKEND_MAILGUN_API_BASE: ${NONPROFITVAULT_BACKEND_MAILGUN_API_BASE}
+        NONPROFITVAULT_BACKEND_MAILGUN_SENDER_EMAIL: ${NONPROFITVAULT_BACKEND_MAILGUN_SENDER_EMAIL}
+        NONPROFITVAULT_BACKEND_PDF_BUILDER_DATA_DIRECTORY_PATH: ${NONPROFITVAULT_BACKEND_PDF_BUILDER_DATA_DIRECTORY_PATH}
+        NONPROFITVAULT_BACKEND_PDF_BUILDER_ASSOCIATE_INVOICE_PATH: ${NONPROFITVAULT_BACKEND_PDF_BUILDER_ASSOCIATE_INVOICE_PATH}
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - app_data:/data
+    networks:
+      - caddy_internal
+
+networks:
+  web:
+    external: true
+  caddy_internal:
+    external: false
+    driver: bridge
+
+volumes:
+  app_data:
+    external: true
+  mongodb_data:
+    external: true
+  mongodb_config:
+    external: true
+  caddy_data:
+    external: true
+  caddy_config:
+    external: true
