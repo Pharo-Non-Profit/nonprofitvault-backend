@@ -198,6 +198,7 @@ badgerdb_data
 # Do not share developer's private notebook
 private.txt
 private.md
+private_prod.md
 todo.txt
 
 # Executable

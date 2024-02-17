@@ -13,8 +13,10 @@ docker-compose.yml
 .env.production
 
 # Project artificats we don't want include.
-private.md
 private.txt
+private.md
+private_prod.md
+todo.txt
 .DS_Store
 docs
 data
