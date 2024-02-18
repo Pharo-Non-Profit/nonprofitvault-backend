@@ -83,7 +83,7 @@ func New() *Conf {
 	c.AWS.Endpoint = getEnv("NONPROFITVAULT_BACKEND_AWS_ENDPOINT", true)
 	c.AWS.Region = getEnv("NONPROFITVAULT_BACKEND_AWS_REGION", true)
 	c.AWS.BucketName = getEnv("NONPROFITVAULT_BACKEND_AWS_BUCKET_NAME", true)
-	c.AWS.SSECustomerKey = getEnv("NONPROFITVAULT_BACKEND_AWS_SSE_CUSTOMER_KEY", false) // You have the option to include it if you want.
+	// c.AWS.SSECustomerKey = getEnv("NONPROFITVAULT_BACKEND_AWS_SSE_CUSTOMER_KEY", false) // Experimental: Do not use yet.
 
 	c.Emailer.APIKey = getEnv("NONPROFITVAULT_BACKEND_MAILGUN_API_KEY", true)
 	c.Emailer.Domain = getEnv("NONPROFITVAULT_BACKEND_MAILGUN_DOMAIN", true)
