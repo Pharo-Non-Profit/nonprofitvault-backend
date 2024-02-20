@@ -1,8 +1,9 @@
 package templatedemailer
 
 import (
-	mg "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/adapter/emailer/mailgun"
 	"log/slog"
+
+	mg "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/adapter/emailer/mailgun"
 
 	c "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/provider/uuid"
@@ -13,6 +14,7 @@ type TemplatedEmailer interface {
 	SendNewUserTemporaryPasswordEmail(email, firstName, temporaryPassword string) error
 	SendVerificationEmail(email, verificationCode, firstName string) error
 	SendForgotPasswordEmail(email, verificationCode, firstName string) error
+	GetDomainName() string
 }
 
 type templatedEmailer struct {
@@ -31,4 +33,7 @@ func NewTemplatedEmailer(cfg *c.Conf, logger *slog.Logger, uuidp uuid.Provider, 
 		Logger:  logger,
 		Emailer: emailer,
 	}
+}
+func (impl *templatedEmailer) GetDomainName() string {
+	return impl.Emailer.GetDomainName()
 }

@@ -36,6 +36,8 @@ type GatewayController interface {
 	ProfileChangePassword(ctx context.Context, req *ProfileChangePasswordRequestIDO) error
 	ExecutiveVisitsTenant(ctx context.Context, req *ExecutiveVisitsTenantRequest) error
 	Dashboard(ctx context.Context) (*DashboardResponseIDO, error)
+	GenerateOTP(ctx context.Context) (*OTPGenerateResponseIDO, error)
+	GenerateOTPAndQRCodePNGImage(ctx context.Context) ([]byte, error)
 }
 
 type GatewayControllerImpl struct {

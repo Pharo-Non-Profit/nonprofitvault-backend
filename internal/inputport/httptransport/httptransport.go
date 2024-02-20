@@ -135,6 +135,10 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 		// case n == 3 && p[1] == "v1" && p[2] == "profile" && r.Method == http.MethodGet:
 	case n == 3 && p[1] == "v1" && p[2] == "executive-visit-tenant" && r.Method == http.MethodPost:
 		port.Gateway.ExecutiveVisitsTenant(w, r)
+	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "generate" && r.Method == http.MethodPost:
+		port.Gateway.GenerateOTP(w, r)
+	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "generate-qr-code" && r.Method == http.MethodPost:
+		port.Gateway.GenerateOTPAndQRCodePNGImage(w, r)
 
 	// // --- DASHBOARD --- //
 	// case n == 3 && p[1] == "v1" && p[2] == "dashboard" && r.Method == http.MethodGet:

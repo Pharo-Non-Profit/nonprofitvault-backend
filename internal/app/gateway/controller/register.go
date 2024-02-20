@@ -254,6 +254,8 @@ func (impl *GatewayControllerImpl) createUserForRequest(sessCtx mongo.SessionCon
 		ShippingAddressLine2:     req.ShippingAddressLine2,
 		HasCouponPromotionalCode: user_s.UserHasCouponPromotionalCodeNo,
 		Coupons:                  make([]*user_s.UserClaimedCoupon, 0),
+		OTPEnabled:               true, // For security purposes we want to force the user to have 2FA enabled by default.
+		OTPVerified:              false,
 	}
 
 	//
