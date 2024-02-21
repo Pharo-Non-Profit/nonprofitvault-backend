@@ -139,6 +139,8 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 		port.Gateway.GenerateOTP(w, r)
 	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "generate-qr-code" && r.Method == http.MethodPost:
 		port.Gateway.GenerateOTPAndQRCodePNGImage(w, r)
+	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "verify" && r.Method == http.MethodPost:
+		port.Gateway.VerifyOTP(w, r)
 
 	// // --- DASHBOARD --- //
 	// case n == 3 && p[1] == "v1" && p[2] == "dashboard" && r.Method == http.MethodGet:

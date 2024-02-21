@@ -38,6 +38,7 @@ type GatewayController interface {
 	Dashboard(ctx context.Context) (*DashboardResponseIDO, error)
 	GenerateOTP(ctx context.Context) (*OTPGenerateResponseIDO, error)
 	GenerateOTPAndQRCodePNGImage(ctx context.Context) ([]byte, error)
+	VerifyOTP(ctx context.Context, req *VerificationTokenRequestIDO) (*VerificationTokenResponseIDO, error)
 }
 
 type GatewayControllerImpl struct {

@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
+	u_d "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config/constants"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
@@ -142,20 +143,18 @@ func (impl *GatewayControllerImpl) GenerateOTPAndQRCodePNGImage(ctx context.Cont
 }
 
 type VerificationTokenRequestIDO struct {
-	Base32     string `json:"base32"`
-	OTPAuthURL string `json:"otpauth_url"`
+	VerificationToken string `json:"verification_token"`
 }
 
 type VerificationTokenResponseIDO struct {
-	Base32     string `json:"base32"`
-	OTPAuthURL string `json:"otpauth_url"`
+	User *u_d.User `json:"user"`
 }
 
 // VerifyOTP function verifies provided token from the third-party authenticator app. The purpose of this function is to finish the otp setup.
 func (impl *GatewayControllerImpl) VerifyOTP(ctx context.Context, req *VerificationTokenRequestIDO) (*VerificationTokenResponseIDO, error) {
 	// Extract from our session the following data.
 	userID, _ := ctx.Value(constants.SessionUserID).(primitive.ObjectID)
-	// sessionID, _ := ctx.Value(constants.SessionID).(string)
+	sessionID, _ := ctx.Value(constants.SessionID).(string)
 
 	////
 	//// Start the transaction.
@@ -187,16 +186,63 @@ func (impl *GatewayControllerImpl) VerifyOTP(ctx context.Context, req *Verificat
 			return nil, httperror.NewForBadRequestWithSingleField("message", "you did not setup two-factor authentication")
 		}
 
-		return nil, nil
+		//
+		// STEP 1: Validate the inputted totp code.
+		//
+
+		if valid := totp.Validate(req.VerificationToken, u.OTPSecret); valid == false {
+
+			//
+			// STEP 2: Invalid tokens for whatever reason must return with error.
+			//
+
+			impl.Logger.Warn("totp verification failed or expired",
+				slog.String("verification_token", req.VerificationToken),
+				slog.String("otp_secret", u.OTPSecret))
+			return nil, httperror.NewForBadRequestWithSingleField("verification_token", "token expired or invalid")
+		}
+
+		//
+		// STEP 3: Update the user's profile.
+		//
+
+		u.OTPVerified = true
+		u.ModifiedAt = time.Now()
+		if err := impl.UserStorer.UpdateByID(sessCtx, u); err != nil {
+			impl.Logger.Error("failed updating user", slog.Any("err", err))
+			return nil, err
+		}
+
+		//
+		// STEP 4: Update the authenticated user session.
+		//
+
+		uBin, err := json.Marshal(u)
+		if err != nil {
+			impl.Logger.Error("marshalling error", slog.Any("err", err))
+			return nil, err
+		}
+		atExpiry := 14 * 24 * time.Hour
+		err = impl.Cache.SetWithExpiry(sessCtx, sessionID, uBin, atExpiry)
+		if err != nil {
+			impl.Logger.Error("cache set with expiry error", slog.Any("err", err))
+			return nil, err
+		}
+
+		return u, nil
 	}
 
 	// Start a transaction
-	result, err := session.WithTransaction(ctx, transactionFunc)
+	u, err := session.WithTransaction(ctx, transactionFunc)
 	if err != nil {
 		impl.Logger.Error("session failed error",
 			slog.Any("error", err))
 		return nil, err
 	}
 
-	return result.(*VerificationTokenResponseIDO), nil
+	res := &VerificationTokenResponseIDO{
+		User: u.(*u_d.User),
+	}
+
+	return res, nil
 }

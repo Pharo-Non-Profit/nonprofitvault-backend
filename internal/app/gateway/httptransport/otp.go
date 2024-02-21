@@ -2,10 +2,12 @@ package httptransport
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
+	otp_c "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/controller"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
@@ -37,4 +39,41 @@ func (h *Handler) GenerateOTPAndQRCodePNGImage(w http.ResponseWriter, r *http.Re
 
 	// Serve the content
 	http.ServeContent(w, r, "opt-qr-code.png", time.Now(), bytes.NewReader(pngImage))
+}
+
+func unmarshalVerifyOTPRequest(ctx context.Context, r *http.Request) (*otp_c.VerificationTokenRequestIDO, error) {
+	// Initialize our array which will store all the results from the remote server.
+	var requestData otp_c.VerificationTokenRequestIDO
+
+	defer r.Body.Close()
+
+	// Read the JSON string and convert it into our golang stuct else we need
+	// to send a `400 Bad Request` errror message back to the client,
+	err := json.NewDecoder(r.Body).Decode(&requestData) // [1]
+	if err != nil {
+		return nil, httperror.NewForSingleField(http.StatusBadRequest, "non_field_error", "payload structure is wrong")
+	}
+
+	return &requestData, nil
+}
+
+func (h *Handler) VerifyOTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	req, err := unmarshalVerifyOTPRequest(ctx, r)
+	if err != nil {
+		httperror.ResponseError(w, err)
+		return
+	}
+
+	res, err := h.Controller.VerifyOTP(ctx, req)
+	if err != nil {
+		httperror.ResponseError(w, err)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(&res); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
