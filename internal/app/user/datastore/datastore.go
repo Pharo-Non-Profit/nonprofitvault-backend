@@ -117,8 +117,11 @@ type User struct {
 	// OTPEnabled controls whether we force 2FA or not during login.
 	OTPEnabled bool `bson:"otp_enabled" json:"otp_enabled"`
 
-	// OTPVerified indicates user has was successfully using 2FA.
+	// OTPVerified indicates user has successfully validated their opt token afer enabling 2FA thus turning it on.
 	OTPVerified bool `bson:"otp_verified" json:"otp_verified"`
+
+	// OTPValidated automatically gets set as `false` on successful login and then sets `true` once successfully validated by 2FA.
+	OTPValidated bool `bson:"otp_validated" json:"otp_validated"`
 
 	// OTPSecret the unique one-time password secret to be shared between our
 	// backend and 2FA authenticator sort of apps that support `TOPT`.

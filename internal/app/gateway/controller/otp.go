@@ -70,6 +70,9 @@ func (impl *GatewayControllerImpl) GenerateOTP(ctx context.Context) (*OTPGenerat
 			}
 
 			// STEP 2: Save the secret to the user's profile.
+			u.OTPEnabled = true
+			u.OTPVerified = false
+			u.OTPValidated = false
 			u.OTPSecret = key.Secret()
 			u.OTPAuthURL = key.URL()
 			u.ModifiedAt = time.Now()
@@ -206,7 +209,15 @@ func (impl *GatewayControllerImpl) VerifyOTP(ctx context.Context, req *Verificat
 		// STEP 3: Update the user's profile.
 		//
 
+		// Set this to be `true` to indicate that the user successfully setup
+		// our 2FA system because backend received a validated token.
 		u.OTPVerified = true
+
+		// Set this `true` vecause we successfully validated the token to
+		// indicate the 2FA was successful.
+		u.OTPValidated = true
+
+		// Keep track of when user's account changes.
 		u.ModifiedAt = time.Now()
 		if err := impl.UserStorer.UpdateByID(sessCtx, u); err != nil {
 			impl.Logger.Error("failed updating user", slog.Any("err", err))
@@ -245,4 +256,190 @@ func (impl *GatewayControllerImpl) VerifyOTP(ctx context.Context, req *Verificat
 	}
 
 	return res, nil
+}
+
+type ValidateTokenRequestIDO struct {
+	Token string `json:"token"`
+}
+
+type ValidateTokenResponseIDO struct {
+	User *u_d.User `json:"user"`
+}
+
+// ValidateOTP function verifies provided token from the third-party authenticator app. The purpose of this function is enable the loggin for 2FA.
+func (impl *GatewayControllerImpl) ValidateOTP(ctx context.Context, req *ValidateTokenRequestIDO) (*ValidateTokenResponseIDO, error) {
+	// Extract from our session the following data.
+	userID, _ := ctx.Value(constants.SessionUserID).(primitive.ObjectID)
+	sessionID, _ := ctx.Value(constants.SessionID).(string)
+
+	////
+	//// Start the transaction.
+	////
+
+	session, err := impl.DbClient.StartSession()
+	if err != nil {
+		impl.Logger.Error("start session error",
+			slog.Any("error", err))
+		return nil, err
+	}
+	defer session.EndSession(ctx)
+
+	// Define a transaction function with a series of operations
+	transactionFunc := func(sessCtx mongo.SessionContext) (interface{}, error) {
+
+		// Lookup the user in our database, else return a `400 Bad Request` error.
+		u, err := impl.UserStorer.GetByID(sessCtx, userID)
+		if err != nil {
+			impl.Logger.Error("failed getting session user", slog.Any("err", err))
+			return nil, err
+		}
+		if u == nil {
+			impl.Logger.Warn("user does not exist validation error")
+			return nil, httperror.NewForBadRequestWithSingleField("id", "does not exist")
+		}
+		if u.OTPSecret == "" {
+			impl.Logger.Warn("user did not run generate otp")
+			return nil, httperror.NewForBadRequestWithSingleField("message", "you did not setup two-factor authentication")
+		}
+
+		//
+		// STEP 1: Validate the inputted totp code.
+		//
+
+		if valid := totp.Validate(req.Token, u.OTPSecret); valid == false {
+
+			//
+			// STEP 2: Invalid tokens for whatever reason must return with error.
+			//
+
+			impl.Logger.Warn("totp verification failed or expired",
+				slog.String("token", req.Token),
+				slog.String("otp_secret", u.OTPSecret))
+			return nil, httperror.NewForBadRequestWithSingleField("token", "expired or invalid")
+		}
+
+		//
+		// STEP 3: Update the user's profile.
+		//
+
+		// Set this `true` vecause we successfully validated the token to
+		// indicate the 2FA was successful.
+		u.OTPValidated = true
+
+		// Keep track of when user's account changes.
+		u.ModifiedAt = time.Now()
+		if err := impl.UserStorer.UpdateByID(sessCtx, u); err != nil {
+			impl.Logger.Error("failed updating user", slog.Any("err", err))
+			return nil, err
+		}
+
+		//
+		// STEP 4: Update the authenticated user session.
+		//
+
+		uBin, err := json.Marshal(u)
+		if err != nil {
+			impl.Logger.Error("marshalling error", slog.Any("err", err))
+			return nil, err
+		}
+		atExpiry := 14 * 24 * time.Hour
+		err = impl.Cache.SetWithExpiry(sessCtx, sessionID, uBin, atExpiry)
+		if err != nil {
+			impl.Logger.Error("cache set with expiry error", slog.Any("err", err))
+			return nil, err
+		}
+
+		return u, nil
+	}
+
+	// Start a transaction
+	u, err := session.WithTransaction(ctx, transactionFunc)
+	if err != nil {
+		impl.Logger.Error("session failed error",
+			slog.Any("error", err))
+		return nil, err
+	}
+
+	res := &ValidateTokenResponseIDO{
+		User: u.(*u_d.User),
+	}
+
+	return res, nil
+}
+
+// DisableOTP function disables 2FA.
+func (impl *GatewayControllerImpl) DisableOTP(ctx context.Context) (*u_d.User, error) {
+	// Extract from our session the following data.
+	userID, _ := ctx.Value(constants.SessionUserID).(primitive.ObjectID)
+	sessionID, _ := ctx.Value(constants.SessionID).(string)
+
+	////
+	//// Start the transaction.
+	////
+
+	session, err := impl.DbClient.StartSession()
+	if err != nil {
+		impl.Logger.Error("start session error",
+			slog.Any("error", err))
+		return nil, err
+	}
+	defer session.EndSession(ctx)
+
+	// Define a transaction function with a series of operations
+	transactionFunc := func(sessCtx mongo.SessionContext) (interface{}, error) {
+
+		// Lookup the user in our database, else return a `400 Bad Request` error.
+		u, err := impl.UserStorer.GetByID(sessCtx, userID)
+		if err != nil {
+			impl.Logger.Error("failed getting session user", slog.Any("err", err))
+			return nil, err
+		}
+		if u == nil {
+			impl.Logger.Warn("user does not exist validation error")
+			return nil, httperror.NewForBadRequestWithSingleField("id", "does not exist")
+		}
+
+		//
+		// STEP 3: Update the user's profile.
+		//
+
+		u.OTPEnabled = false
+		u.OTPVerified = false
+		u.OTPValidated = false
+		u.OTPSecret = ""
+		u.OTPAuthURL = ""
+		u.ModifiedAt = time.Now()
+		if err := impl.UserStorer.UpdateByID(sessCtx, u); err != nil {
+			impl.Logger.Error("failed updating user", slog.Any("err", err))
+			return nil, err
+		}
+
+		//
+		// STEP 4: Update the authenticated user session.
+		//
+
+		uBin, err := json.Marshal(u)
+		if err != nil {
+			impl.Logger.Error("marshalling error", slog.Any("err", err))
+			return nil, err
+		}
+		atExpiry := 14 * 24 * time.Hour
+		err = impl.Cache.SetWithExpiry(sessCtx, sessionID, uBin, atExpiry)
+		if err != nil {
+			impl.Logger.Error("cache set with expiry error", slog.Any("err", err))
+			return nil, err
+		}
+
+		return u, nil
+	}
+
+	// Start a transaction
+	res, err := session.WithTransaction(ctx, transactionFunc)
+	if err != nil {
+		impl.Logger.Error("session failed error",
+			slog.Any("error", err))
+		return nil, err
+	}
+
+	return res.(*u_d.User), nil
 }

@@ -141,6 +141,10 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 		port.Gateway.GenerateOTPAndQRCodePNGImage(w, r)
 	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "verify" && r.Method == http.MethodPost:
 		port.Gateway.VerifyOTP(w, r)
+	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "validate" && r.Method == http.MethodPost:
+		port.Gateway.ValidateOTP(w, r)
+	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "disabled" && r.Method == http.MethodPost:
+		port.Gateway.DisableOTP(w, r)
 
 	// // --- DASHBOARD --- //
 	// case n == 3 && p[1] == "v1" && p[2] == "dashboard" && r.Method == http.MethodGet:

@@ -43,9 +43,9 @@ func (impl *GatewayControllerImpl) Login(ctx context.Context, email, password st
 
 	// Enforce 2FA if enabled.
 	if u.OTPEnabled {
-		// We need to reset the `otp_verified` status to be false to force
+		// We need to reset the `otp_validated` status to be false to force
 		// the user to use their `totp authenticator` application.
-		u.OTPVerified = false
+		u.OTPValidated = false
 		u.ModifiedAt = time.Now()
 		if err := impl.UserStorer.UpdateByID(ctx, u); err != nil {
 			impl.Logger.Error("failed updating user during login", slog.Any("err", err))

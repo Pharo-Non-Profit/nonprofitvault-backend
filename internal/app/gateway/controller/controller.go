@@ -15,6 +15,7 @@ import (
 	gateway_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/datastore"
 	howhear_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/datastore"
 	tenant_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/datastore"
+	u_d "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 	user_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/provider/jwt"
@@ -39,6 +40,8 @@ type GatewayController interface {
 	GenerateOTP(ctx context.Context) (*OTPGenerateResponseIDO, error)
 	GenerateOTPAndQRCodePNGImage(ctx context.Context) ([]byte, error)
 	VerifyOTP(ctx context.Context, req *VerificationTokenRequestIDO) (*VerificationTokenResponseIDO, error)
+	ValidateOTP(ctx context.Context, req *ValidateTokenRequestIDO) (*ValidateTokenResponseIDO, error)
+	DisableOTP(ctx context.Context) (*u_d.User, error)
 }
 
 type GatewayControllerImpl struct {
