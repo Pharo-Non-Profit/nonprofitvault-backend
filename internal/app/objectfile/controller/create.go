@@ -21,7 +21,7 @@ type ObjectFileCreateRequestIDO struct {
 	FileName       string
 	FileType       string
 	File           multipart.File
-	Category       uint64
+	SmartFolderID  primitive.ObjectID
 	Classification uint64
 }
 
@@ -31,8 +31,8 @@ func validateCreateRequest(dirtyData *ObjectFileCreateRequestIDO) error {
 	if dirtyData.FileName == "" {
 		e["file"] = "missing value"
 	}
-	if dirtyData.Category == 0 {
-		e["category"] = "missing value"
+	if dirtyData.SmartFolderID.IsZero() {
+		e["smart_folder_id"] = "missing value"
 	}
 	if dirtyData.Classification == 0 {
 		e["classification"] = "missing value"
@@ -58,8 +58,14 @@ func (c *ObjectFileControllerImpl) Create(ctx context.Context, req *ObjectFileCr
 		return nil, err
 	}
 
+	sf, err := c.SmartFolderStorer.GetByID(ctx, req.SmartFolderID)
+	if err != nil {
+		c.Logger.Error("failed getting smart folder", slog.Any("error", err))
+		return nil, err
+	}
+
 	// Generate the key of our upload.
-	objectKey := fmt.Sprintf("ten_%v/cat_%d/class_%d/%v", orgID.Hex(), req.Category, req.Classification, req.FileName)
+	objectKey := fmt.Sprintf("ten_%v/cat_%d/subcat_%d/class_%d/%v", orgID.Hex(), sf.Category, sf.SubCategory, req.Classification, req.FileName)
 
 	// For debugging purposes only.
 	c.Logger.Debug("pre-upload meta",
@@ -68,7 +74,7 @@ func (c *ObjectFileControllerImpl) Create(ctx context.Context, req *ObjectFileCr
 		slog.String("object_key", objectKey),
 		slog.String("name", req.Name),
 		slog.String("description", req.Description),
-		slog.Any("category", req.Category),
+		slog.Any("smart_folder_id", sf.ID),
 		slog.Any("classification", req.Classification),
 	)
 
@@ -85,26 +91,29 @@ func (c *ObjectFileControllerImpl) Create(ctx context.Context, req *ObjectFileCr
 
 	// Create our meta record in the database.
 	res := &a_d.ObjectFile{
-		TenantID:           orgID,
-		TenantName:         orgName,
-		ID:                 primitive.NewObjectID(),
-		CreatedAt:          time.Now(),
-		CreatedByUserName:  userName,
-		CreatedByUserID:    userID,
-		ModifiedAt:         time.Now(),
-		ModifiedByUserName: userName,
-		ModifiedByUserID:   userID,
-		Name:               req.Name,
-		Description:        req.Description,
-		Filename:           req.FileName,
-		ObjectKey:          objectKey,
-		ObjectURL:          "",
-		Status:             a_d.StatusActive,
-		Category:           req.Category,
-		Classification:     req.Classification,
+		TenantID:               orgID,
+		TenantName:             orgName,
+		ID:                     primitive.NewObjectID(),
+		CreatedAt:              time.Now(),
+		CreatedByUserName:      userName,
+		CreatedByUserID:        userID,
+		ModifiedAt:             time.Now(),
+		ModifiedByUserName:     userName,
+		ModifiedByUserID:       userID,
+		Name:                   req.Name,
+		Description:            req.Description,
+		Filename:               req.FileName,
+		ObjectKey:              objectKey,
+		ObjectURL:              "",
+		Status:                 a_d.StatusActive,
+		SmartFolderID:          sf.ID,
+		SmartFolderName:        sf.Name,
+		SmartFolderCategory:    sf.Category,
+		SmartFolderSubCategory: sf.SubCategory,
+		Classification:         req.Classification,
 	}
-	err := c.ObjectFileStorer.Create(ctx, res)
-	if err != nil {
+
+	if err := c.ObjectFileStorer.Create(ctx, res); err != nil {
 		c.Logger.Error("objectfile create error", slog.Any("error", err))
 		return nil, err
 	}

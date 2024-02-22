@@ -9,6 +9,7 @@ import (
 
 	object_storage "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/adapter/storage/object"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/adapter/templatedemailer"
+	objectfile_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/datastore"
 	smartfolder_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/datastore"
 	user_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config"
@@ -30,16 +31,17 @@ type SmartFolderController interface {
 }
 
 type SmartFolderControllerImpl struct {
-	Config                   *config.Conf
-	Logger                   *slog.Logger
-	UUID                     uuid.Provider
-	ObjectStorage            object_storage.ObjectStorager
-	Password                 password.Provider
-	Kmutex                   kmutex.Provider
-	DbClient                 *mongo.Client
-	UserStorer               user_s.UserStorer
+	Config            *config.Conf
+	Logger            *slog.Logger
+	UUID              uuid.Provider
+	ObjectStorage     object_storage.ObjectStorager
+	Password          password.Provider
+	Kmutex            kmutex.Provider
+	DbClient          *mongo.Client
+	UserStorer        user_s.UserStorer
 	SmartFolderStorer smartfolder_s.SmartFolderStorer
-	TemplatedEmailer         templatedemailer.TemplatedEmailer
+	ObjectFileStorer  objectfile_s.ObjectFileStorer
+	TemplatedEmailer  templatedemailer.TemplatedEmailer
 }
 
 func NewController(
@@ -53,18 +55,20 @@ func NewController(
 	client *mongo.Client,
 	usr_storer user_s.UserStorer,
 	smartfolder_s smartfolder_s.SmartFolderStorer,
+	obj_storer objectfile_s.ObjectFileStorer,
 ) SmartFolderController {
 	s := &SmartFolderControllerImpl{
-		Config:                   appCfg,
-		Logger:                   loggerp,
-		UUID:                     uuidp,
-		ObjectStorage:            object,
-		Password:                 passwordp,
-		Kmutex:                   kmux,
-		TemplatedEmailer:         temailer,
-		DbClient:                 client,
-		UserStorer:               usr_storer,
+		Config:            appCfg,
+		Logger:            loggerp,
+		UUID:              uuidp,
+		ObjectStorage:     object,
+		Password:          passwordp,
+		Kmutex:            kmux,
+		TemplatedEmailer:  temailer,
+		DbClient:          client,
+		UserStorer:        usr_storer,
 		SmartFolderStorer: smartfolder_s,
+		ObjectFileStorer:  obj_storer,
 	}
 	s.Logger.Debug("smartfolder controller initialization started...")
 	s.Logger.Debug("smartfolder controller initialized")

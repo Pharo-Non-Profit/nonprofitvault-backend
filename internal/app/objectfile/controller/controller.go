@@ -11,6 +11,7 @@ import (
 	object_storage "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/adapter/storage/object"
 	domain "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/datastore"
 	objectfile_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/datastore"
+	smartfolder_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/datastore"
 	user_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/provider/uuid"
@@ -29,14 +30,15 @@ type ObjectFileController interface {
 }
 
 type ObjectFileControllerImpl struct {
-	Config           *config.Conf
-	Logger           *slog.Logger
-	UUID             uuid.Provider
-	ObjectStorage    object_storage.ObjectStorager
-	Emailer          mg.Emailer
-	DbClient         *mongo.Client
-	ObjectFileStorer objectfile_s.ObjectFileStorer
-	UserStorer       user_s.UserStorer
+	Config            *config.Conf
+	Logger            *slog.Logger
+	UUID              uuid.Provider
+	ObjectStorage     object_storage.ObjectStorager
+	Emailer           mg.Emailer
+	DbClient          *mongo.Client
+	SmartFolderStorer smartfolder_s.SmartFolderStorer
+	ObjectFileStorer  objectfile_s.ObjectFileStorer
+	UserStorer        user_s.UserStorer
 }
 
 func NewController(
@@ -46,18 +48,20 @@ func NewController(
 	object object_storage.ObjectStorager,
 	client *mongo.Client,
 	emailer mg.Emailer,
+	smartfolder_s smartfolder_s.SmartFolderStorer,
 	org_storer objectfile_s.ObjectFileStorer,
 	usr_storer user_s.UserStorer,
 ) ObjectFileController {
 	s := &ObjectFileControllerImpl{
-		Config:           appCfg,
-		Logger:           loggerp,
-		UUID:             uuidp,
-		ObjectStorage:    object,
-		Emailer:          emailer,
-		DbClient:         client,
-		ObjectFileStorer: org_storer,
-		UserStorer:       usr_storer,
+		Config:            appCfg,
+		Logger:            loggerp,
+		UUID:              uuidp,
+		ObjectStorage:     object,
+		Emailer:           emailer,
+		DbClient:          client,
+		SmartFolderStorer: smartfolder_s,
+		ObjectFileStorer:  org_storer,
+		UserStorer:        usr_storer,
 	}
 	s.Logger.Debug("objectfile controller initialization started...")
 	s.Logger.Debug("objectfile controller initialized")

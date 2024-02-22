@@ -14,24 +14,27 @@ import (
 )
 
 type ObjectFile struct {
-	TenantID           primitive.ObjectID `bson:"tenant_id,omitempty" json:"tenant_id,omitempty"`
-	TenantName         string             `bson:"tenant_name" json:"tenant_name"`
-	ID                 primitive.ObjectID `bson:"_id" json:"id"`
-	CreatedAt          time.Time          `bson:"created_at,omitempty" json:"created_at,omitempty"`
-	CreatedByUserName  string             `bson:"created_by_user_name" json:"-"` // Hidden from public.
-	CreatedByUserID    primitive.ObjectID `bson:"created_by_user_id" json:"-"`   // Hidden from public.
-	ModifiedAt         time.Time          `bson:"modified_at,omitempty" json:"modified_at,omitempty"`
-	ModifiedByUserName string             `bson:"modified_by_user_name" json:"-"` // Hidden from public.
-	ModifiedByUserID   primitive.ObjectID `bson:"modified_by_user_id" json:"-"`   // Hidden from public.
-	Name               string             `bson:"name" json:"name"`
-	Description        string             `bson:"description" json:"description"`
-	Filename           string             `bson:"filename" json:"filename"`
-	ObjectKey          string             `bson:"object_key" json:"-"` // Hidden from public.
-	ObjectURL          string             `bson:"object_url" json:"-"` // Hidden from public.
-	Status             int8               `bson:"status" json:"status"`
-	ContentType        int8               `bson:"content_type" json:"content_type"`
-	Category           uint64             `bson:"category,omitempty" json:"category,omitempty"`
-	Classification     uint64             `bson:"classification" json:"classification"`
+	TenantID               primitive.ObjectID `bson:"tenant_id,omitempty" json:"tenant_id,omitempty"`
+	TenantName             string             `bson:"tenant_name" json:"tenant_name"`
+	ID                     primitive.ObjectID `bson:"_id" json:"id"`
+	CreatedAt              time.Time          `bson:"created_at,omitempty" json:"created_at,omitempty"`
+	CreatedByUserName      string             `bson:"created_by_user_name" json:"-"` // Hidden from public.
+	CreatedByUserID        primitive.ObjectID `bson:"created_by_user_id" json:"-"`   // Hidden from public.
+	ModifiedAt             time.Time          `bson:"modified_at,omitempty" json:"modified_at,omitempty"`
+	ModifiedByUserName     string             `bson:"modified_by_user_name" json:"-"` // Hidden from public.
+	ModifiedByUserID       primitive.ObjectID `bson:"modified_by_user_id" json:"-"`   // Hidden from public.
+	Name                   string             `bson:"name" json:"name"`
+	Description            string             `bson:"description" json:"description"`
+	Filename               string             `bson:"filename" json:"filename"`
+	ObjectKey              string             `bson:"object_key" json:"-"` // Hidden from public.
+	ObjectURL              string             `bson:"object_url" json:"-"` // Hidden from public.
+	Status                 int8               `bson:"status" json:"status"`
+	ContentType            int8               `bson:"content_type" json:"content_type"`
+	Classification         uint64             `bson:"classification" json:"classification"`
+	SmartFolderID          primitive.ObjectID `bson:"smart_folder_id" json:"smart_folder_id"`
+	SmartFolderName        string             `bson:"smart_folder_name" json:"smart_folder_name"`
+	SmartFolderCategory    uint64             `bson:"smart_folder_category,omitempty" json:"smart_folder_category,omitempty"`
+	SmartFolderSubCategory uint64             `bson:"smart_folder_sub_category,omitempty" json:"smart_folder_sub_category,omitempty"`
 }
 
 type ObjectFileListFilter struct {

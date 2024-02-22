@@ -25,7 +25,7 @@ type ObjectFileUpdateRequestIDO struct {
 	FileName       string
 	FileType       string
 	File           multipart.File
-	Category       uint64
+	SmartFolderID  primitive.ObjectID
 	Classification uint64
 }
 
@@ -35,8 +35,8 @@ func ValidateUpdateRequest(dirtyData *ObjectFileUpdateRequestIDO) error {
 	if dirtyData.ID.IsZero() {
 		e["id"] = "missing value"
 	}
-	if dirtyData.Category == 0 {
-		e["category"] = "missing value"
+	if dirtyData.SmartFolderID.IsZero() {
+		e["smart_folder_id"] = "missing value"
 	}
 	if dirtyData.Classification == 0 {
 		e["classification"] = "missing value"
@@ -86,6 +86,12 @@ func (c *ObjectFileControllerImpl) UpdateByID(ctx context.Context, req *ObjectFi
 		return nil, httperror.NewForForbiddenWithSingleField("message", "you do not belong to this objectfile")
 	}
 
+	sf, err := c.SmartFolderStorer.GetByID(ctx, req.SmartFolderID)
+	if err != nil {
+		c.Logger.Error("failed getting smart folder", slog.Any("error", err))
+		return nil, err
+	}
+
 	// Update the file if the user uploaded a new file.
 	if req.File != nil {
 		// Proceed to delete the physical files from AWS object.
@@ -97,7 +103,7 @@ func (c *ObjectFileControllerImpl) UpdateByID(ctx context.Context, req *ObjectFi
 		}
 
 		// Generate the key of our upload.
-		objectKey := fmt.Sprintf("ten_%v/cat_%d/class_%d/%v", orgID.Hex(), req.Category, req.Classification, req.FileName)
+		objectKey := fmt.Sprintf("ten_%v/cat_%d/subcat_%d/class_%d/%v", orgID.Hex(), sf.Category, sf.SubCategory, req.Classification, req.FileName)
 
 		go func(file multipart.File, objkey string) {
 			c.Logger.Debug("beginning private object image upload...")
@@ -120,7 +126,7 @@ func (c *ObjectFileControllerImpl) UpdateByID(ctx context.Context, req *ObjectFi
 			slog.String("object_key", objectKey),
 			slog.String("name", req.Name),
 			slog.String("description", req.Description),
-			slog.Any("category", req.Category),
+			slog.Any("smart_folder_id", sf.ID),
 			slog.Any("classification", req.Classification),
 		)
 	}
@@ -131,7 +137,10 @@ func (c *ObjectFileControllerImpl) UpdateByID(ctx context.Context, req *ObjectFi
 	os.ModifiedByUserName = userName
 	os.Name = req.Name
 	os.Description = req.Description
-	os.Category = req.Category
+	os.SmartFolderID = sf.ID
+	os.SmartFolderName = sf.Name
+	os.SmartFolderCategory = sf.Category
+	os.SmartFolderSubCategory = sf.SubCategory
 	os.Classification = req.Classification
 
 	// Save to the database the modified objectfile.
