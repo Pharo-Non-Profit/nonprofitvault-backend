@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	smartfolder_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/datastore"
-	u_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config/constants"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
@@ -60,18 +59,18 @@ func (impl *SmartFolderControllerImpl) UpdateByID(ctx context.Context, requestDa
 	//
 
 	tid, _ := ctx.Value(constants.SessionUserTenantID).(primitive.ObjectID)
-	role, _ := ctx.Value(constants.SessionUserRole).(int8)
+	// role, _ := ctx.Value(constants.SessionUserRole).(int8)
 	userID, _ := ctx.Value(constants.SessionUserID).(primitive.ObjectID)
 	userName, _ := ctx.Value(constants.SessionUserName).(string)
 	ipAddress, _ := ctx.Value(constants.SessionIPAddress).(string)
 
-	switch role {
-	case u_s.UserRoleExecutive, u_s.UserRoleManagement, u_s.UserRoleFrontlineStaff:
-		break
-	default:
-		impl.Logger.Error("you do not have permission to create a client")
-		return nil, httperror.NewForForbiddenWithSingleField("message", "you do not have permission to create a client")
-	}
+	// switch role {
+	// case u_s.UserRoleExecutive, u_s.UserRoleManagement, u_s.UserRoleFrontlineStaff:
+	// 	break
+	// default:
+	// 	impl.Logger.Error("you do not have permission to create a client")
+	// 	return nil, httperror.NewForForbiddenWithSingleField("message", "you do not have permission to create a client")
+	// }
 
 	////
 	//// Start the transaction.
