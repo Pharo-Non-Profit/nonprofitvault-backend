@@ -70,7 +70,9 @@ type ObjectFileStorer interface {
 	UpdateByID(ctx context.Context, m *ObjectFile) error
 	ListByFilter(ctx context.Context, m *ObjectFileListFilter) (*ObjectFileListResult, error)
 	ListAsSelectOptionByFilter(ctx context.Context, f *ObjectFileListFilter) ([]*ObjectFileAsSelectOption, error)
+	ListObjectKeysBySmartFolderID(ctx context.Context, sfid primitive.ObjectID) ([]string, error)
 	DeleteByID(ctx context.Context, id primitive.ObjectID) error
+	DeleteBySmartFolderID(ctx context.Context, smartFolderID primitive.ObjectID) error
 	// //TODO: Add more...
 }
 

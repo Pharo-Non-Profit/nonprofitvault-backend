@@ -15,3 +15,14 @@ func (impl ObjectFileStorerImpl) DeleteByID(ctx context.Context, id primitive.Ob
 	}
 	return nil
 }
+
+func (impl ObjectFileStorerImpl) DeleteBySmartFolderID(ctx context.Context, smartFolderID primitive.ObjectID) error {
+	filter := bson.M{"smart_folder_id": smartFolderID}
+
+	_, err := impl.Collection.DeleteMany(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
