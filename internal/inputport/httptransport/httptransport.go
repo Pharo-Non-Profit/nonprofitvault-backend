@@ -143,7 +143,7 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 		port.Gateway.VerifyOTP(w, r)
 	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "validate" && r.Method == http.MethodPost:
 		port.Gateway.ValidateOTP(w, r)
-	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "disabled" && r.Method == http.MethodPost:
+	case n == 4 && p[1] == "v1" && p[2] == "otp" && p[3] == "disable" && r.Method == http.MethodPost:
 		port.Gateway.DisableOTP(w, r)
 
 	// // --- DASHBOARD --- //
