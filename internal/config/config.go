@@ -27,11 +27,12 @@ type initialAccountConf struct {
 }
 
 type serverConf struct {
-	Port         string
-	IP           string
-	HMACSecret   []byte
-	HasDebugging bool
-	DomainName   string
+	Port                    string
+	IP                      string
+	HMACSecret              []byte
+	HasDebugging            bool
+	DomainName              string
+	Enable2FAOnRegistration bool
 }
 
 type dbConfig struct {
@@ -74,6 +75,7 @@ func New() *Conf {
 	c.AppServer.HMACSecret = []byte(getEnv("NONPROFITVAULT_BACKEND_HMAC_SECRET", true))
 	c.AppServer.HasDebugging = getEnvBool("NONPROFITVAULT_BACKEND_HAS_DEBUGGING", true, true)
 	c.AppServer.DomainName = getEnv("NONPROFITVAULT_BACKEND_DOMAIN_NAME", true)
+	c.AppServer.Enable2FAOnRegistration = getEnvBool("NONPROFITVAULT_BACKEND_APP_ENABLE_2FA_ON_REGISTRATION", false, false)
 
 	c.DB.URI = getEnv("NONPROFITVAULT_BACKEND_DB_URI", true)
 	c.DB.Name = getEnv("NONPROFITVAULT_BACKEND_DB_NAME", true)
