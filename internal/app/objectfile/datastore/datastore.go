@@ -46,7 +46,7 @@ type ObjectFileListFilter struct {
 
 	// Filter related.
 	TenantID        primitive.ObjectID
-	OwnershipID     primitive.ObjectID
+	SmartFolderID   primitive.ObjectID
 	UserID          primitive.ObjectID
 	UserRole        int8
 	ExcludeArchived bool

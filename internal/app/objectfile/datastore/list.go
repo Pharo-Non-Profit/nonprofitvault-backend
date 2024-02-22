@@ -25,8 +25,8 @@ func (impl ObjectFileStorerImpl) ListByFilter(ctx context.Context, f *ObjectFile
 	if f.TenantID != primitive.NilObjectID {
 		filter["tenant_id"] = f.TenantID
 	}
-	if f.OwnershipID != primitive.NilObjectID {
-		filter["ownership_id"] = f.OwnershipID
+	if !f.SmartFolderID.IsZero() {
+		filter["smart_folder_id"] = f.SmartFolderID
 	}
 	if f.ExcludeArchived {
 		filter["status"] = bson.M{"$ne": StatusArchived} // Do not list archived items! This code
@@ -38,7 +38,7 @@ func (impl ObjectFileStorerImpl) ListByFilter(ctx context.Context, f *ObjectFile
 		slog.String("SortField", f.SortField),
 		slog.Any("SortOrder", f.SortOrder),
 		slog.Any("TenantID", f.TenantID),
-		slog.Any("OwnershipID", f.OwnershipID),
+		slog.Any("smart_folder_id", f.SmartFolderID),
 		slog.Any("ExcludeArchived", f.ExcludeArchived),
 	)
 

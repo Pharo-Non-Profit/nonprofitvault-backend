@@ -15,7 +15,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 
 	f := &sub_s.ObjectFileListFilter{
 		Cursor:          primitive.NilObjectID,
-		OwnershipID:     primitive.NilObjectID,
+		SmartFolderID:   primitive.NilObjectID,
 		PageSize:        25,
 		SortField:       "_id",
 		SortOrder:       1, // 1=ascending | -1=descending
@@ -35,14 +35,14 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 		f.Cursor = cursor
 	}
 
-	ownershipID := query.Get("ownership_id")
-	if ownershipID != "" {
-		ownershipID, err := primitive.ObjectIDFromHex(ownershipID)
+	sfidstr := query.Get("smart_folder_id")
+	if sfidstr != "" {
+		smartFolderID, err := primitive.ObjectIDFromHex(sfidstr)
 		if err != nil {
 			httperror.ResponseError(w, err)
 			return
 		}
-		f.OwnershipID = ownershipID
+		f.SmartFolderID = smartFolderID
 	}
 
 	pageSize := query.Get("page_size")
