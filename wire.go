@@ -24,18 +24,21 @@ import (
 
 	ds_howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/datastore"
 	ds_objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/datastore"
+	ds_smartfolder "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/datastore"
 	ds_tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/datastore"
 	ds_user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 
 	uc_gateway "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/controller"
 	uc_howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/controller"
 	uc_objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/controller"
+	uc_smartfolder "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/controller"
 	uc_tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/controller"
 	uc_user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/controller"
 
 	http_gate "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/httptransport"
 	http_howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/httptransport"
 	http_objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/httptransport"
+	http_smartfolder "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/httptransport"
 	http_tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/httptransport"
 	http_user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/httptransport"
 
@@ -73,6 +76,7 @@ func InitializeEvent() Application {
 		ds_user.NewDatastore,
 		ds_howhear.NewDatastore,
 		ds_objectfile.NewDatastore,
+		ds_smartfolder.NewDatastore,
 
 		// USECASE
 		uc_tenant.NewController,
@@ -80,6 +84,7 @@ func InitializeEvent() Application {
 		uc_user.NewController,
 		uc_howhear.NewController,
 		uc_objectfile.NewController,
+		uc_smartfolder.NewController,
 
 		// HTTP TRANSPORT SECTION
 		http_tenant.NewHandler,
@@ -87,6 +92,7 @@ func InitializeEvent() Application {
 		http_user.NewHandler,
 		http_howhear.NewHandler,
 		http_objectfile.NewHandler,
+		http_smartfolder.NewHandler,
 
 		// INPUT PORT SECTION
 		http_middleware.NewMiddleware,

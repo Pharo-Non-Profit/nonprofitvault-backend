@@ -67,6 +67,7 @@ func (impl *GatewayControllerImpl) initializeAccounts(ctx context.Context) error
 			AgreeTOS:              true,
 			OTPEnabled:            true,  // Force 2FA
 			OTPVerified:           false, // On login begin enforcing 2FA.
+			Country:               "Canada",
 		}
 		err = impl.UserStorer.Create(ctx, admin)
 		if err != nil {

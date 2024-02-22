@@ -10,6 +10,7 @@ import (
 	gateway "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/httptransport"
 	howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/httptransport"
 	objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/httptransport"
+	sf_http "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/httptransport"
 	tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/httptransport"
 	user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/httptransport"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config"
@@ -22,15 +23,16 @@ type InputPortServer interface {
 }
 
 type httpTransportInputPort struct {
-	Config     *config.Conf
-	Logger     *slog.Logger
-	Server     *http.Server
-	Middleware middleware.Middleware
-	Tenant     *tenant.Handler
-	Gateway    *gateway.Handler
-	User       *user.Handler
-	HowHear    *howhear.Handler
-	ObjectFile *objectfile.Handler
+	Config      *config.Conf
+	Logger      *slog.Logger
+	Server      *http.Server
+	Middleware  middleware.Middleware
+	Tenant      *tenant.Handler
+	Gateway     *gateway.Handler
+	User        *user.Handler
+	HowHear     *howhear.Handler
+	ObjectFile  *objectfile.Handler
+	SmartFolder *sf_http.Handler
 }
 
 func NewInputPort(
@@ -42,6 +44,7 @@ func NewInputPort(
 	user *user.Handler,
 	howhear *howhear.Handler,
 	att *objectfile.Handler,
+	sf *sf_http.Handler,
 ) InputPortServer {
 	// Initialize the ServeMux.
 	mux := http.NewServeMux()
@@ -60,15 +63,16 @@ func NewInputPort(
 
 	// Create our HTTP server controller.
 	p := &httpTransportInputPort{
-		Config:     configp,
-		Logger:     loggerp,
-		Middleware: mid,
-		Tenant:     org,
-		Gateway:    gate,
-		User:       user,
-		HowHear:    howhear,
-		ObjectFile: att,
-		Server:     srv,
+		Config:      configp,
+		Logger:      loggerp,
+		Middleware:  mid,
+		Tenant:      org,
+		Gateway:     gate,
+		User:        user,
+		HowHear:     howhear,
+		ObjectFile:  att,
+		SmartFolder: sf,
+		Server:      srv,
 	}
 
 	// Attach the HTTP server controller to the ServerMux.
@@ -203,6 +207,18 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 		port.User.OperationCreateComment(w, r)
 	case n == 4 && p[1] == "v1" && p[2] == "users" && p[3] == "select-options" && r.Method == http.MethodGet:
 		port.User.ListAsSelectOptions(w, r)
+
+	// --- SMART FOLDERS --- //
+	case n == 3 && p[1] == "v1" && p[2] == "smart-folders" && r.Method == http.MethodGet:
+		port.SmartFolder.List(w, r)
+	case n == 3 && p[1] == "v1" && p[2] == "smart-folders" && r.Method == http.MethodPost:
+		port.SmartFolder.Create(w, r)
+	case n == 4 && p[1] == "v1" && p[2] == "smart-folder" && r.Method == http.MethodGet:
+		port.SmartFolder.GetByID(w, r, p[3])
+	case n == 4 && p[1] == "v1" && p[2] == "smart-folder" && r.Method == http.MethodPut:
+		port.SmartFolder.UpdateByID(w, r, p[3])
+	case n == 4 && p[1] == "v1" && p[2] == "smart-folder" && r.Method == http.MethodDelete:
+		port.SmartFolder.DeleteByID(w, r, p[3])
 
 	// --- OBJECT FILES --- //
 	case n == 3 && p[1] == "v1" && p[2] == "object-files" && r.Method == http.MethodGet:

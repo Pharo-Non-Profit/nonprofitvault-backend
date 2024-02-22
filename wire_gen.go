@@ -19,6 +19,9 @@ import (
 	controller5 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/controller"
 	datastore4 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/datastore"
 	httptransport5 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/httptransport"
+	controller6 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/controller"
+	datastore5 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/datastore"
+	httptransport6 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/httptransport"
 	controller2 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/controller"
 	datastore2 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/httptransport"
@@ -26,7 +29,7 @@ import (
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
 	httptransport3 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/httptransport"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config"
-	httptransport6 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/inputport/httptransport"
+	httptransport7 "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/inputport/httptransport"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/inputport/httptransport/middleware"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/provider/jwt"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/provider/kmutex"
@@ -72,7 +75,10 @@ func InitializeEvent() Application {
 	objectFileStorer := datastore4.NewDatastore(conf, slogLogger, client)
 	objectFileController := controller5.NewController(conf, slogLogger, provider, objectStorager, client, emailer, objectFileStorer, userStorer)
 	handler4 := httptransport5.NewHandler(slogLogger, objectFileController)
-	inputPortServer := httptransport6.NewInputPort(conf, slogLogger, middlewareMiddleware, handler, httptransportHandler, handler2, handler3, handler4)
+	smartFolderStorer := datastore5.NewDatastore(conf, slogLogger, client)
+	smartFolderController := controller6.NewController(conf, slogLogger, provider, objectStorager, passwordProvider, kmutexProvider, templatedEmailer, client, userStorer, smartFolderStorer)
+	handler5 := httptransport6.NewHandler(slogLogger, smartFolderController)
+	inputPortServer := httptransport7.NewInputPort(conf, slogLogger, middlewareMiddleware, handler, httptransportHandler, handler2, handler3, handler4, handler5)
 	application := NewApplication(slogLogger, inputPortServer)
 	return application
 }
