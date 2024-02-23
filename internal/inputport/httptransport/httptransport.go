@@ -219,6 +219,8 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 		port.SmartFolder.UpdateByID(w, r, p[3])
 	case n == 4 && p[1] == "v1" && p[2] == "smart-folder" && r.Method == http.MethodDelete:
 		port.SmartFolder.DeleteByID(w, r, p[3])
+	case n == 5 && p[1] == "v1" && p[2] == "smart-folders" && p[3] == "operations" && p[4] == "generate-sharable-link" && r.Method == http.MethodPost:
+		port.SmartFolder.GenerateSharableLink(w, r)
 
 	// --- OBJECT FILES --- //
 	case n == 3 && p[1] == "v1" && p[2] == "object-files" && r.Method == http.MethodGet:
