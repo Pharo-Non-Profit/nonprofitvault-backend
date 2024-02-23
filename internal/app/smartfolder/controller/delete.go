@@ -26,9 +26,11 @@ func (impl *SmartFolderControllerImpl) DeleteByID(ctx context.Context, sfid prim
 		impl.Logger.Error("failed getting object keys by smart folder id", slog.Any("error", err))
 		return err
 	}
-	if err := impl.ObjectStorage.DeleteByKeys(ctx, keys); err != nil {
-		impl.Logger.Error("failed deleting object from object store", slog.Any("error", err))
-		return err
+	if len(keys) > 0 {
+		if err := impl.ObjectStorage.DeleteByKeys(ctx, keys); err != nil {
+			impl.Logger.Warn("failed deleting object from object store", slog.Any("error", err))
+			// Skip error and continue...
+		}
 	}
 
 	// Step 3: Delete all the object files related.
