@@ -24,6 +24,7 @@ import (
 
 	ds_howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/datastore"
 	ds_objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/datastore"
+	ds_sharablelink "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
 	ds_smartfolder "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/datastore"
 	ds_tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/datastore"
 	ds_user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/datastore"
@@ -31,6 +32,7 @@ import (
 	uc_gateway "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/controller"
 	uc_howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/controller"
 	uc_objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/controller"
+	uc_sharablelink "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/controller"
 	uc_smartfolder "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/controller"
 	uc_tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/controller"
 	uc_user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/controller"
@@ -38,6 +40,7 @@ import (
 	http_gate "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/httptransport"
 	http_howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/httptransport"
 	http_objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/httptransport"
+	http_sharablelink "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/httptransport"
 	http_smartfolder "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/httptransport"
 	http_tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/httptransport"
 	http_user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/httptransport"
@@ -77,6 +80,7 @@ func InitializeEvent() Application {
 		ds_howhear.NewDatastore,
 		ds_objectfile.NewDatastore,
 		ds_smartfolder.NewDatastore,
+		ds_sharablelink.NewDatastore,
 
 		// USECASE
 		uc_tenant.NewController,
@@ -85,6 +89,7 @@ func InitializeEvent() Application {
 		uc_howhear.NewController,
 		uc_objectfile.NewController,
 		uc_smartfolder.NewController,
+		uc_sharablelink.NewController,
 
 		// HTTP TRANSPORT SECTION
 		http_tenant.NewHandler,
@@ -93,6 +98,7 @@ func InitializeEvent() Application {
 		http_howhear.NewHandler,
 		http_objectfile.NewHandler,
 		http_smartfolder.NewHandler,
+		http_sharablelink.NewHandler,
 
 		// INPUT PORT SECTION
 		http_middleware.NewMiddleware,
