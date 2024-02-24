@@ -5,19 +5,19 @@ import (
 	"net/http"
 	"strconv"
 
-	sharablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
+	shareablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
 func (h *Handler) ListAsSelectOptions(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	f := &sharablelink_s.SharableLinkPaginationListFilter{
+	f := &shareablelink_s.ShareableLinkPaginationListFilter{
 		PageSize: 1_000_000,
 		// LastID:    "",
 		SortField: "sort_number",
 		SortOrder: 1, // 1=ascending | -1=descending
-		Status:    sharablelink_s.StatusActive,
+		Status:    shareablelink_s.StatusActive,
 	}
 
 	// Here is where you extract url parameters.
@@ -39,7 +39,7 @@ func (h *Handler) ListAsSelectOptions(w http.ResponseWriter, r *http.Request) {
 	MarshalListAsSelectOptionResponse(m, w)
 }
 
-func MarshalListAsSelectOptionResponse(res []*sharablelink_s.SharableLinkAsSelectOption, w http.ResponseWriter) {
+func MarshalListAsSelectOptionResponse(res []*shareablelink_s.ShareableLinkAsSelectOption, w http.ResponseWriter) {
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -49,12 +49,12 @@ func MarshalListAsSelectOptionResponse(res []*sharablelink_s.SharableLinkAsSelec
 func (h *Handler) PublicListAsSelectOptions(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	f := &sharablelink_s.SharableLinkPaginationListFilter{
+	f := &shareablelink_s.ShareableLinkPaginationListFilter{
 		PageSize: 1_000_000,
 		// LastID:    "",
 		SortField: "sort_number",
 		SortOrder: 1, // 1=ascending | -1=descending
-		Status:    sharablelink_s.StatusActive,
+		Status:    shareablelink_s.StatusActive,
 	}
 
 	// Here is where you extract url parameters.

@@ -9,17 +9,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	sharablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
+	shareablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config/constants"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
-type SharableLinkCreateRequestIDO struct {
+type ShareableLinkCreateRequestIDO struct {
 	SmartFolderID primitive.ObjectID `bson:"smart_folder_id" json:"smart_folder_id"`
 	ExpiresIn     uint64             `bson:"expires_in,omitempty" json:"expires_in,omitempty"`
 }
 
-func (impl *SharableLinkControllerImpl) validateCreateRequest(ctx context.Context, dirtyData *SharableLinkCreateRequestIDO) error {
+func (impl *ShareableLinkControllerImpl) validateCreateRequest(ctx context.Context, dirtyData *ShareableLinkCreateRequestIDO) error {
 	e := make(map[string]string)
 
 	if dirtyData.SmartFolderID.IsZero() {
@@ -35,7 +35,7 @@ func (impl *SharableLinkControllerImpl) validateCreateRequest(ctx context.Contex
 	return nil
 }
 
-func (impl *SharableLinkControllerImpl) Create(ctx context.Context, req *SharableLinkCreateRequestIDO) (*sharablelink_s.SharableLink, error) {
+func (impl *ShareableLinkControllerImpl) Create(ctx context.Context, req *ShareableLinkCreateRequestIDO) (*shareablelink_s.ShareableLink, error) {
 	//
 	// Get variables from our user authenticated session.
 	//
@@ -101,7 +101,7 @@ func (impl *SharableLinkControllerImpl) Create(ctx context.Context, req *Sharabl
 			return nil, httperror.NewForSingleField(http.StatusBadRequest, "smart_folder_id", "smart folder does not exist")
 		}
 
-		sl := &sharablelink_s.SharableLink{}
+		sl := &shareablelink_s.ShareableLink{}
 
 		// Add defaults.
 		sl.TenantID = tid
@@ -123,11 +123,11 @@ func (impl *SharableLinkControllerImpl) Create(ctx context.Context, req *Sharabl
 		sl.SmartFolderCategory = sf.Category
 		sl.SmartFolderSubCategory = sf.SubCategory
 		sl.SmartFolderDescription = sf.Description
-		sl.Status = sharablelink_s.StatusActive
+		sl.Status = shareablelink_s.StatusActive
 
 		// Save to our database.
-		if err := impl.SharableLinkStorer.Create(sessCtx, sl); err != nil {
-			impl.Logger.Error("failed creating sharable link", slog.Any("error", err))
+		if err := impl.ShareableLinkStorer.Create(sessCtx, sl); err != nil {
+			impl.Logger.Error("failed creating shareable link", slog.Any("error", err))
 			return nil, err
 		}
 
@@ -146,5 +146,5 @@ func (impl *SharableLinkControllerImpl) Create(ctx context.Context, req *Sharabl
 		return nil, err
 	}
 
-	return result.(*sharablelink_s.SharableLink), nil
+	return result.(*shareablelink_s.ShareableLink), nil
 }

@@ -6,8 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (impl SharableLinkStorerImpl) ListByTenantID(ctx context.Context, tid primitive.ObjectID) (*SharableLinkPaginationListResult, error) {
-	f := &SharableLinkPaginationListFilter{
+func (impl ShareableLinkStorerImpl) ListByTenantID(ctx context.Context, tid primitive.ObjectID) (*ShareableLinkPaginationListResult, error) {
+	f := &ShareableLinkPaginationListFilter{
 		Cursor:    "",
 		PageSize:  1_000_000_000, // Unlimited
 		SortField: "sort_number",

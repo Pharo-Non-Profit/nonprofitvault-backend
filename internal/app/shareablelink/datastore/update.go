@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (impl SharableLinkStorerImpl) UpdateByID(ctx context.Context, m *SharableLink) error {
+func (impl ShareableLinkStorerImpl) UpdateByID(ctx context.Context, m *ShareableLink) error {
 	filter := bson.D{{"_id", m.ID}}
 
 	update := bson.M{ // DEVELOPERS NOTE: https://stackoverflow.com/a/60946010

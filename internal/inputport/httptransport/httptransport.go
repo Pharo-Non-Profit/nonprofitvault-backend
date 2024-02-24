@@ -10,7 +10,7 @@ import (
 	gateway "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/gateway/httptransport"
 	howhear "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/howhear/httptransport"
 	objectfile "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/objectfile/httptransport"
-	sl_http "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/httptransport"
+	sl_http "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/httptransport"
 	sf_http "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/smartfolder/httptransport"
 	tenant "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/tenant/httptransport"
 	user "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/user/httptransport"
@@ -24,17 +24,17 @@ type InputPortServer interface {
 }
 
 type httpTransportInputPort struct {
-	Config       *config.Conf
-	Logger       *slog.Logger
-	Server       *http.Server
-	Middleware   middleware.Middleware
-	Tenant       *tenant.Handler
-	Gateway      *gateway.Handler
-	User         *user.Handler
-	HowHear      *howhear.Handler
-	ObjectFile   *objectfile.Handler
-	SmartFolder  *sf_http.Handler
-	SharableLink *sl_http.Handler
+	Config        *config.Conf
+	Logger        *slog.Logger
+	Server        *http.Server
+	Middleware    middleware.Middleware
+	Tenant        *tenant.Handler
+	Gateway       *gateway.Handler
+	User          *user.Handler
+	HowHear       *howhear.Handler
+	ObjectFile    *objectfile.Handler
+	SmartFolder   *sf_http.Handler
+	ShareableLink *sl_http.Handler
 }
 
 func NewInputPort(
@@ -66,17 +66,17 @@ func NewInputPort(
 
 	// Create our HTTP server controller.
 	p := &httpTransportInputPort{
-		Config:       configp,
-		Logger:       loggerp,
-		Middleware:   mid,
-		Tenant:       org,
-		Gateway:      gate,
-		User:         user,
-		HowHear:      howhear,
-		ObjectFile:   att,
-		SmartFolder:  sf,
-		SharableLink: sl,
-		Server:       srv,
+		Config:        configp,
+		Logger:        loggerp,
+		Middleware:    mid,
+		Tenant:        org,
+		Gateway:       gate,
+		User:          user,
+		HowHear:       howhear,
+		ObjectFile:    att,
+		SmartFolder:   sf,
+		ShareableLink: sl,
+		Server:        srv,
 	}
 
 	// Attach the HTTP server controller to the ServerMux.
@@ -223,8 +223,8 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 		port.SmartFolder.UpdateByID(w, r, p[3])
 	case n == 4 && p[1] == "v1" && p[2] == "smart-folder" && r.Method == http.MethodDelete:
 		port.SmartFolder.DeleteByID(w, r, p[3])
-	case n == 5 && p[1] == "v1" && p[2] == "smart-folders" && p[3] == "operations" && p[4] == "generate-sharable-link" && r.Method == http.MethodPost:
-		port.SmartFolder.GenerateSharableLink(w, r)
+	case n == 5 && p[1] == "v1" && p[2] == "smart-folders" && p[3] == "operations" && p[4] == "generate-shareable-link" && r.Method == http.MethodPost:
+		port.SmartFolder.GenerateShareableLink(w, r)
 
 	// --- OBJECT FILES --- //
 	case n == 3 && p[1] == "v1" && p[2] == "object-files" && r.Method == http.MethodGet:
@@ -245,18 +245,18 @@ func (port *httpTransportInputPort) HandleRequests(w http.ResponseWriter, r *htt
 	// --- SMART FOLDERS --- //
 	// case n == 3 && p[1] == "v1" && p[2] == "smart-folders" && r.Method == http.MethodGet:
 	// 	port.SmartFolder.List(w, r)
-	case n == 3 && p[1] == "v1" && p[2] == "sharable-links" && r.Method == http.MethodPost:
-		port.SharableLink.Create(w, r)
-	case n == 4 && p[1] == "v1" && p[2] == "sharable-link" && r.Method == http.MethodGet:
-		port.SharableLink.GetByID(w, r, p[3])
+	case n == 3 && p[1] == "v1" && p[2] == "shareable-links" && r.Method == http.MethodPost:
+		port.ShareableLink.Create(w, r)
+	case n == 4 && p[1] == "v1" && p[2] == "shareable-link" && r.Method == http.MethodGet:
+		port.ShareableLink.GetByID(w, r, p[3])
 	// case n == 4 && p[1] == "v1" && p[2] == "smart-folder" && r.Method == http.MethodPut:
 	// 	port.SmartFolder.UpdateByID(w, r, p[3])
 	// case n == 4 && p[1] == "v1" && p[2] == "smart-folder" && r.Method == http.MethodDelete:
 	// 	port.SmartFolder.DeleteByID(w, r, p[3])
-	// case n == 5 && p[1] == "v1" && p[2] == "smart-folders" && p[3] == "operations" && p[4] == "generate-sharable-link" && r.Method == http.MethodPost:
-	// 	port.SmartFolder.GenerateSharableLink(w, r)
-	case n == 5 && p[1] == "v1" && p[2] == "public" && p[3] == "sharable-link" && r.Method == http.MethodGet:
-		port.SharableLink.PublicGetByID(w, r, p[4])
+	// case n == 5 && p[1] == "v1" && p[2] == "smart-folders" && p[3] == "operations" && p[4] == "generate-shareable-link" && r.Method == http.MethodPost:
+	// 	port.SmartFolder.GenerateShareableLink(w, r)
+	case n == 5 && p[1] == "v1" && p[2] == "public" && p[3] == "shareable-link" && r.Method == http.MethodGet:
+		port.ShareableLink.PublicGetByID(w, r, p[4])
 
 	// --- CATCH ALL: D.N.E. ---
 	default:

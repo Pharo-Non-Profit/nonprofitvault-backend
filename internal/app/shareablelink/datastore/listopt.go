@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (impl SharableLinkStorerImpl) ListAsSelectOptionByFilter(ctx context.Context, f *SharableLinkPaginationListFilter) ([]*SharableLinkAsSelectOption, error) {
+func (impl ShareableLinkStorerImpl) ListAsSelectOptionByFilter(ctx context.Context, f *ShareableLinkPaginationListFilter) ([]*ShareableLinkAsSelectOption, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
 	defer cancel()
 
@@ -59,7 +59,7 @@ func (impl SharableLinkStorerImpl) ListAsSelectOptionByFilter(ctx context.Contex
 	}
 	defer cursor.Close(ctx)
 
-	var results = []*SharableLinkAsSelectOption{}
+	var results = []*ShareableLinkAsSelectOption{}
 	if err = cursor.All(ctx, &results); err != nil {
 		panic(err)
 	}

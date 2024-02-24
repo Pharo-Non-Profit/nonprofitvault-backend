@@ -7,12 +7,12 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	sharablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
-	t_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
+	shareablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
+	t_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config/constants"
 )
 
-func (c *SharableLinkControllerImpl) ListByFilter(ctx context.Context, f *t_s.SharableLinkPaginationListFilter) (*t_s.SharableLinkPaginationListResult, error) {
+func (c *ShareableLinkControllerImpl) ListByFilter(ctx context.Context, f *t_s.ShareableLinkPaginationListFilter) (*t_s.ShareableLinkPaginationListResult, error) {
 	// // Extract from our session the following data.
 	tenantID := ctx.Value(constants.SessionUserTenantID).(primitive.ObjectID)
 
@@ -36,7 +36,7 @@ func (c *SharableLinkControllerImpl) ListByFilter(ctx context.Context, f *t_s.Sh
 		// slog.Time("CreatedAtGTE", f.CreatedAtGTE)
 	)
 
-	m, err := c.SharableLinkStorer.ListByFilter(ctx, f)
+	m, err := c.ShareableLinkStorer.ListByFilter(ctx, f)
 	if err != nil {
 		c.Logger.Error("database list by filter error", slog.Any("error", err))
 		return nil, err
@@ -44,7 +44,7 @@ func (c *SharableLinkControllerImpl) ListByFilter(ctx context.Context, f *t_s.Sh
 	return m, err
 }
 
-// func (c *SharableLinkControllerImpl) LiteListByFilter(ctx context.Context, f *t_s.SharableLinkPaginationListFilter) (*t_s.SharableLinkLiteListResult, error) {
+// func (c *ShareableLinkControllerImpl) LiteListByFilter(ctx context.Context, f *t_s.ShareableLinkPaginationListFilter) (*t_s.ShareableLinkLiteListResult, error) {
 // 	// // Extract from our session the following data.
 // 	tenantID := ctx.Value(constants.SessionUserTenantID).(primitive.ObjectID)
 //
@@ -59,7 +59,7 @@ func (c *SharableLinkControllerImpl) ListByFilter(ctx context.Context, f *t_s.Sh
 // 		slog.Any("TenantID", f.TenantID),
 // 	)
 //
-// 	m, err := c.SharableLinkStorer.LiteListByFilter(ctx, f)
+// 	m, err := c.ShareableLinkStorer.LiteListByFilter(ctx, f)
 // 	if err != nil {
 // 		c.Logger.Error("database list by filter error", slog.Any("error", err))
 // 		return nil, err
@@ -67,7 +67,7 @@ func (c *SharableLinkControllerImpl) ListByFilter(ctx context.Context, f *t_s.Sh
 // 	return m, err
 // }
 
-func (c *SharableLinkControllerImpl) ListAsSelectOptionByFilter(ctx context.Context, f *sharablelink_s.SharableLinkPaginationListFilter) ([]*sharablelink_s.SharableLinkAsSelectOption, error) {
+func (c *ShareableLinkControllerImpl) ListAsSelectOptionByFilter(ctx context.Context, f *shareablelink_s.ShareableLinkPaginationListFilter) ([]*shareablelink_s.ShareableLinkAsSelectOption, error) {
 	// // Extract from our session the following data.
 	tenantID := ctx.Value(constants.SessionUserTenantID).(primitive.ObjectID)
 
@@ -83,7 +83,7 @@ func (c *SharableLinkControllerImpl) ListAsSelectOptionByFilter(ctx context.Cont
 	)
 
 	// Filtering the database.
-	m, err := c.SharableLinkStorer.ListAsSelectOptionByFilter(ctx, f)
+	m, err := c.ShareableLinkStorer.ListAsSelectOptionByFilter(ctx, f)
 	if err != nil {
 		c.Logger.Error("database list by filter error", slog.Any("error", err))
 		return nil, err
@@ -91,7 +91,7 @@ func (c *SharableLinkControllerImpl) ListAsSelectOptionByFilter(ctx context.Cont
 	return m, err
 }
 
-func (c *SharableLinkControllerImpl) PublicListAsSelectOptionByFilter(ctx context.Context, f *sharablelink_s.SharableLinkPaginationListFilter) ([]*sharablelink_s.SharableLinkAsSelectOption, error) {
+func (c *ShareableLinkControllerImpl) PublicListAsSelectOptionByFilter(ctx context.Context, f *shareablelink_s.ShareableLinkPaginationListFilter) ([]*shareablelink_s.ShareableLinkAsSelectOption, error) {
 
 	// // If unspecified the tenant then auto-assign the default tenant in our app.
 	// if tenant == nil {
@@ -110,7 +110,7 @@ func (c *SharableLinkControllerImpl) PublicListAsSelectOptionByFilter(ctx contex
 	)
 
 	// Filtering the database.
-	m, err := c.SharableLinkStorer.ListAsSelectOptionByFilter(ctx, f)
+	m, err := c.ShareableLinkStorer.ListAsSelectOptionByFilter(ctx, f)
 	if err != nil {
 		c.Logger.Error("database list by filter error", slog.Any("error", err))
 		return nil, err

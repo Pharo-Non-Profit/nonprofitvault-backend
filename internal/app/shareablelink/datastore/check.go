@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-func (impl SharableLinkStorerImpl) CheckIfExistsByEmail(ctx context.Context, email string) (bool, error) {
+func (impl ShareableLinkStorerImpl) CheckIfExistsByEmail(ctx context.Context, email string) (bool, error) {
 	filter := bson.D{{"email", email}}
 	count, err := impl.Collection.CountDocuments(ctx, filter)
 	if err != nil {

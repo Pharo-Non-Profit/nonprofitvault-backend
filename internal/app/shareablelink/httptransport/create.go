@@ -6,14 +6,14 @@ import (
 	"log"
 	"net/http"
 
-	sharablelink_c "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/controller"
-	sharablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
+	shareablelink_c "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/controller"
+	shareablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
-func UnmarshalCreateRequest(ctx context.Context, r *http.Request) (*sharablelink_c.SharableLinkCreateRequestIDO, error) {
+func UnmarshalCreateRequest(ctx context.Context, r *http.Request) (*shareablelink_c.ShareableLinkCreateRequestIDO, error) {
 	// Initialize our array which will store all the results from the remote server.
-	var requestData sharablelink_c.SharableLinkCreateRequestIDO
+	var requestData shareablelink_c.ShareableLinkCreateRequestIDO
 
 	defer r.Body.Close()
 
@@ -45,7 +45,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	MarshalCreateResponse(res, w)
 }
 
-func MarshalCreateResponse(res *sharablelink_s.SharableLink, w http.ResponseWriter) {
+func MarshalCreateResponse(res *shareablelink_s.ShareableLink, w http.ResponseWriter) {
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

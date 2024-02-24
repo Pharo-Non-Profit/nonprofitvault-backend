@@ -16,7 +16,7 @@ const (
 	OrderDescending = -1
 )
 
-type SharableLinkPaginationListFilter struct {
+type ShareableLinkPaginationListFilter struct {
 	// Pagination related.
 	Cursor    string
 	PageSize  int64
@@ -29,17 +29,17 @@ type SharableLinkPaginationListFilter struct {
 	SearchText string
 }
 
-// SharableLinkPaginationListResult represents the paginated list results for
+// ShareableLinkPaginationListResult represents the paginated list results for
 // the associate records.
-type SharableLinkPaginationListResult struct {
-	Results     []*SharableLink `json:"results"`
+type ShareableLinkPaginationListResult struct {
+	Results     []*ShareableLink `json:"results"`
 	NextCursor  string          `json:"next_cursor"`
 	HasNextPage bool            `json:"has_next_page"`
 }
 
 // newPaginationFilter will create the mongodb filter to apply the cursor or
 // or ignore it depending if a cursor was specified in the filter.
-func (impl SharableLinkStorerImpl) newPaginationFilter(f *SharableLinkPaginationListFilter) (bson.M, error) {
+func (impl ShareableLinkStorerImpl) newPaginationFilter(f *ShareableLinkPaginationListFilter) (bson.M, error) {
 	if len(f.Cursor) > 0 {
 		// STEP 1: Decode the cursor which is encoded in a base64 format.
 		decodedCursor, err := base64.RawStdEncoding.DecodeString(f.Cursor)
@@ -58,7 +58,7 @@ func (impl SharableLinkStorerImpl) newPaginationFilter(f *SharableLinkPagination
 	return bson.M{}, nil
 }
 
-func (impl SharableLinkStorerImpl) newPaginationFilterBasedOnString(f *SharableLinkPaginationListFilter, decodedCursor string) (bson.M, error) {
+func (impl ShareableLinkStorerImpl) newPaginationFilterBasedOnString(f *ShareableLinkPaginationListFilter, decodedCursor string) (bson.M, error) {
 	// Extract our cursor into two parts which we need to use.
 	arr := strings.Split(decodedCursor, "|")
 	if len(arr) < 1 {
@@ -93,7 +93,7 @@ func (impl SharableLinkStorerImpl) newPaginationFilterBasedOnString(f *SharableL
 	}
 }
 
-func (impl SharableLinkStorerImpl) newPaginationFilterBasedOnInt8(f *SharableLinkPaginationListFilter, decodedCursor string) (bson.M, error) {
+func (impl ShareableLinkStorerImpl) newPaginationFilterBasedOnInt8(f *ShareableLinkPaginationListFilter, decodedCursor string) (bson.M, error) {
 	// Extract our cursor into two parts which we need to use.
 	arr := strings.Split(decodedCursor, "|")
 	if len(arr) < 1 {
@@ -128,7 +128,7 @@ func (impl SharableLinkStorerImpl) newPaginationFilterBasedOnInt8(f *SharableLin
 	}
 }
 
-func (impl SharableLinkStorerImpl) newPaginationFilterBasedOnTimestamp(f *SharableLinkPaginationListFilter, decodedCursor string) (bson.M, error) {
+func (impl ShareableLinkStorerImpl) newPaginationFilterBasedOnTimestamp(f *ShareableLinkPaginationListFilter, decodedCursor string) (bson.M, error) {
 	// Extract our cursor into two parts which we need to use.
 	arr := strings.Split(decodedCursor, "|")
 	if len(arr) < 1 {
@@ -170,7 +170,7 @@ func (impl SharableLinkStorerImpl) newPaginationFilterBasedOnTimestamp(f *Sharab
 
 // newPaginatorOptions will generate the mongodb options which will support the
 // paginator in ordering the data to work.
-func (impl SharableLinkStorerImpl) newPaginationOptions(f *SharableLinkPaginationListFilter) (*options.FindOptions, error) {
+func (impl ShareableLinkStorerImpl) newPaginationOptions(f *ShareableLinkPaginationListFilter) (*options.FindOptions, error) {
 	options := options.Find().SetLimit(f.PageSize)
 
 	// DEVELOPERS NOTE:
@@ -189,8 +189,8 @@ func (impl SharableLinkStorerImpl) newPaginationOptions(f *SharableLinkPaginatio
 
 // newPaginatorNextCursor will return the base64 encoded next cursor which works
 // with our paginator.
-func (impl SharableLinkStorerImpl) newPaginatorNextCursor(f *SharableLinkPaginationListFilter, results []*SharableLink) (string, error) {
-	var lastDatum *SharableLink
+func (impl ShareableLinkStorerImpl) newPaginatorNextCursor(f *ShareableLinkPaginationListFilter, results []*ShareableLink) (string, error) {
+	var lastDatum *ShareableLink
 
 	// Remove the extra document from the current page
 	results = results[:]

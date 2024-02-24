@@ -28,7 +28,7 @@ type SmartFolderController interface {
 	PublicListAsSelectOptionByFilter(ctx context.Context, f *smartfolder_s.SmartFolderPaginationListFilter) ([]*smartfolder_s.SmartFolderAsSelectOption, error)
 	ArchiveByID(ctx context.Context, id primitive.ObjectID) (*smartfolder_s.SmartFolder, error)
 	DeleteByID(ctx context.Context, id primitive.ObjectID) error
-	GenerateSharableLink(ctx context.Context, requestData *GenerateSharableLinkRequestIDO) (*GenerateSharableLinkResponseIDO, error)
+	GenerateShareableLink(ctx context.Context, requestData *GenerateShareableLinkRequestIDO) (*GenerateShareableLinkResponseIDO, error)
 }
 
 type SmartFolderControllerImpl struct {

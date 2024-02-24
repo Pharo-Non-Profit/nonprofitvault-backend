@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-func (impl SharableLinkStorerImpl) CreateOrGetByID(ctx context.Context, hh *SharableLink) (*SharableLink, error) {
+func (impl ShareableLinkStorerImpl) CreateOrGetByID(ctx context.Context, hh *ShareableLink) (*ShareableLink, error) {
 	res, err := impl.GetByID(ctx, hh.ID)
 	if err != nil {
 		return nil, err

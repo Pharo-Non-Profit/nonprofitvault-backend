@@ -10,9 +10,9 @@ import (
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
-func UnmarshalGenerateSharableLinkRequest(ctx context.Context, r *http.Request) (*smartfolder_c.GenerateSharableLinkRequestIDO, error) {
+func UnmarshalGenerateShareableLinkRequest(ctx context.Context, r *http.Request) (*smartfolder_c.GenerateShareableLinkRequestIDO, error) {
 	// Initialize our array which will store all the results from the remote server.
-	var requestData smartfolder_c.GenerateSharableLinkRequestIDO
+	var requestData smartfolder_c.GenerateShareableLinkRequestIDO
 
 	defer r.Body.Close()
 
@@ -26,16 +26,16 @@ func UnmarshalGenerateSharableLinkRequest(ctx context.Context, r *http.Request) 
 	return &requestData, nil
 }
 
-func (h *Handler) GenerateSharableLink(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GenerateShareableLink(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	data, err := UnmarshalGenerateSharableLinkRequest(ctx, r)
+	data, err := UnmarshalGenerateShareableLinkRequest(ctx, r)
 	if err != nil {
 		httperror.ResponseError(w, err)
 		return
 	}
 
-	res, err := h.Controller.GenerateSharableLink(ctx, data)
+	res, err := h.Controller.GenerateShareableLink(ctx, data)
 	if err != nil {
 		httperror.ResponseError(w, err)
 		return

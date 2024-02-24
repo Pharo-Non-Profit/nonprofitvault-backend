@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (impl SharableLinkStorerImpl) ListByFilter(ctx context.Context, f *SharableLinkPaginationListFilter) (*SharableLinkPaginationListResult, error) {
+func (impl ShareableLinkStorerImpl) ListByFilter(ctx context.Context, f *ShareableLinkPaginationListFilter) (*ShareableLinkPaginationListResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
 	defer cancel()
 
@@ -24,7 +24,7 @@ func (impl SharableLinkStorerImpl) ListByFilter(ctx context.Context, f *Sharable
 	}
 
 	// if f.ExcludeArchived {
-	// 	filter["status"] = bson.M{"$ne": SharableLinkStatusArchived} // Do not list archived items! This code
+	// 	filter["status"] = bson.M{"$ne": ShareableLinkStatusArchived} // Do not list archived items! This code
 	// }
 	if f.Status != 0 {
 		filter["status"] = f.Status
@@ -59,10 +59,10 @@ func (impl SharableLinkStorerImpl) ListByFilter(ctx context.Context, f *Sharable
 	// }
 
 	// Retrieve the documents and check if there is a next page
-	results := []*SharableLink{}
+	results := []*ShareableLink{}
 	hasNextPage := false
 	for cursor.Next(ctx) {
-		document := &SharableLink{}
+		document := &ShareableLink{}
 		if err := cursor.Decode(document); err != nil {
 			return nil, err
 		}
@@ -83,7 +83,7 @@ func (impl SharableLinkStorerImpl) ListByFilter(ctx context.Context, f *Sharable
 		}
 	}
 
-	return &SharableLinkPaginationListResult{
+	return &ShareableLinkPaginationListResult{
 		Results:     results,
 		NextCursor:  nextCursor,
 		HasNextPage: hasNextPage,

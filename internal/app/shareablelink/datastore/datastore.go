@@ -21,7 +21,7 @@ const (
 	CategoryGovernmentCanada = 2
 )
 
-type SharableLink struct {
+type ShareableLink struct {
 	ExpiryDate             time.Time          `bson:"expiry_date" json:"expiry_date"`
 	ExpiresIn              uint64             `bson:"expires_in,omitempty" json:"expires_in,omitempty"`
 	SmartFolderID          primitive.ObjectID `bson:"smart_folder_id" json:"smart_folder_id"`
@@ -44,42 +44,42 @@ type SharableLink struct {
 	TenantName             string             `bson:"tenant_name" json:"tenant_name"`
 }
 
-type SharableLinkListResult struct {
-	Results     []*SharableLink    `json:"results"`
+type ShareableLinkListResult struct {
+	Results     []*ShareableLink    `json:"results"`
 	NextCursor  primitive.ObjectID `json:"next_cursor"`
 	HasNextPage bool               `json:"has_next_page"`
 }
 
-type SharableLinkAsSelectOption struct {
+type ShareableLinkAsSelectOption struct {
 	Value primitive.ObjectID `bson:"_id" json:"value"` // Extract from the database `_id` field and output through API as `value`.
 	Label string             `bson:"text" json:"label"`
 }
 
-// SharableLinkStorer Interface for user.
-type SharableLinkStorer interface {
-	Create(ctx context.Context, m *SharableLink) error
-	CreateOrGetByID(ctx context.Context, hh *SharableLink) (*SharableLink, error)
-	GetByID(ctx context.Context, id primitive.ObjectID) (*SharableLink, error)
-	GetByPublicID(ctx context.Context, oldID uint64) (*SharableLink, error)
-	GetByText(ctx context.Context, text string) (*SharableLink, error)
-	GetLatestByTenantID(ctx context.Context, tenantID primitive.ObjectID) (*SharableLink, error)
+// ShareableLinkStorer Interface for user.
+type ShareableLinkStorer interface {
+	Create(ctx context.Context, m *ShareableLink) error
+	CreateOrGetByID(ctx context.Context, hh *ShareableLink) (*ShareableLink, error)
+	GetByID(ctx context.Context, id primitive.ObjectID) (*ShareableLink, error)
+	GetByPublicID(ctx context.Context, oldID uint64) (*ShareableLink, error)
+	GetByText(ctx context.Context, text string) (*ShareableLink, error)
+	GetLatestByTenantID(ctx context.Context, tenantID primitive.ObjectID) (*ShareableLink, error)
 	CheckIfExistsByEmail(ctx context.Context, email string) (bool, error)
-	UpdateByID(ctx context.Context, m *SharableLink) error
-	ListByFilter(ctx context.Context, f *SharableLinkPaginationListFilter) (*SharableLinkPaginationListResult, error)
-	ListAsSelectOptionByFilter(ctx context.Context, f *SharableLinkPaginationListFilter) ([]*SharableLinkAsSelectOption, error)
-	ListByTenantID(ctx context.Context, tid primitive.ObjectID) (*SharableLinkPaginationListResult, error)
+	UpdateByID(ctx context.Context, m *ShareableLink) error
+	ListByFilter(ctx context.Context, f *ShareableLinkPaginationListFilter) (*ShareableLinkPaginationListResult, error)
+	ListAsSelectOptionByFilter(ctx context.Context, f *ShareableLinkPaginationListFilter) ([]*ShareableLinkAsSelectOption, error)
+	ListByTenantID(ctx context.Context, tid primitive.ObjectID) (*ShareableLinkPaginationListResult, error)
 	DeleteByID(ctx context.Context, id primitive.ObjectID) error
 }
 
-type SharableLinkStorerImpl struct {
+type ShareableLinkStorerImpl struct {
 	Logger     *slog.Logger
 	DbClient   *mongo.Client
 	Collection *mongo.Collection
 }
 
-func NewDatastore(appCfg *c.Conf, loggerp *slog.Logger, client *mongo.Client) SharableLinkStorer {
+func NewDatastore(appCfg *c.Conf, loggerp *slog.Logger, client *mongo.Client) ShareableLinkStorer {
 	// ctx := context.Background()
-	uc := client.Database(appCfg.DB.Name).Collection("sharable_links")
+	uc := client.Database(appCfg.DB.Name).Collection("shareable_links")
 
 	_, err := uc.Indexes().CreateMany(context.TODO(), []mongo.IndexModel{
 		{Keys: bson.D{{Key: "tenant_id", Value: 1}}},
@@ -97,7 +97,7 @@ func NewDatastore(appCfg *c.Conf, loggerp *slog.Logger, client *mongo.Client) Sh
 		log.Fatal(err)
 	}
 
-	s := &SharableLinkStorerImpl{
+	s := &ShareableLinkStorerImpl{
 		Logger:     loggerp,
 		DbClient:   client,
 		Collection: uc,

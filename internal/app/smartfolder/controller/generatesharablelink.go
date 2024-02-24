@@ -11,16 +11,16 @@ import (
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
-type GenerateSharableLinkRequestIDO struct {
+type GenerateShareableLinkRequestIDO struct {
 	SmartFolderID primitive.ObjectID `bson:"smart_folder_id" json:"smart_folder_id"`
 	ExpiresIn     uint64             `bson:"expires_in,omitempty" json:"expires_in,omitempty"`
 }
 
-type GenerateSharableLinkResponseIDO struct {
+type GenerateShareableLinkResponseIDO struct {
 	URL string `bson:"url,omitempty" json:"url,omitempty"`
 }
 
-func (impl *SmartFolderControllerImpl) validatGenerateSharableLinkRequest(ctx context.Context, dirtyData *GenerateSharableLinkRequestIDO) error {
+func (impl *SmartFolderControllerImpl) validatGenerateShareableLinkRequest(ctx context.Context, dirtyData *GenerateShareableLinkRequestIDO) error {
 	e := make(map[string]string)
 
 	if dirtyData.SmartFolderID.IsZero() {
@@ -36,7 +36,7 @@ func (impl *SmartFolderControllerImpl) validatGenerateSharableLinkRequest(ctx co
 	return nil
 }
 
-func (impl *SmartFolderControllerImpl) GenerateSharableLink(ctx context.Context, requestData *GenerateSharableLinkRequestIDO) (*GenerateSharableLinkResponseIDO, error) {
+func (impl *SmartFolderControllerImpl) GenerateShareableLink(ctx context.Context, requestData *GenerateShareableLinkRequestIDO) (*GenerateShareableLinkResponseIDO, error) {
 	//
 	// Get variables from our user authenticated session.
 	//
@@ -56,14 +56,14 @@ func (impl *SmartFolderControllerImpl) GenerateSharableLink(ctx context.Context,
 	// 4. Apply the PID to the record.
 	// 5. Unlock this `Create` function to be usable again by other calls after
 	//    the function successfully submits the record into our system.
-	impl.Kmutex.Lockf("generate-smart-folder-sharable-link-by-tenant-%s", tid.Hex())
-	defer impl.Kmutex.Unlockf("generate-smart-folder-sharable-link-by-tenant-%s", tid.Hex())
+	impl.Kmutex.Lockf("generate-smart-folder-shareable-link-by-tenant-%s", tid.Hex())
+	defer impl.Kmutex.Unlockf("generate-smart-folder-shareable-link-by-tenant-%s", tid.Hex())
 
 	//
 	// Perform our validation and return validation error on any issues detected.
 	//
 
-	if err := impl.validatGenerateSharableLinkRequest(ctx, requestData); err != nil {
+	if err := impl.validatGenerateShareableLinkRequest(ctx, requestData); err != nil {
 		impl.Logger.Error("validation error", slog.Any("error", err))
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (impl *SmartFolderControllerImpl) GenerateSharableLink(ctx context.Context,
 		return nil, err
 	}
 
-	res := &GenerateSharableLinkResponseIDO{
+	res := &GenerateShareableLinkResponseIDO{
 		URL: result.(string),
 	}
 

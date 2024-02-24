@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (impl SharableLinkStorerImpl) Create(ctx context.Context, u *SharableLink) error {
+func (impl ShareableLinkStorerImpl) Create(ctx context.Context, u *ShareableLink) error {
 	// DEVELOPER NOTES:
 	// According to mongodb documentaiton:
 	//     Non-existent Databases and Collections
@@ -39,7 +39,7 @@ func (impl SharableLinkStorerImpl) Create(ctx context.Context, u *SharableLink) 
 	return nil
 }
 
-func (impl SharableLinkStorerImpl) generatePublicID(ctx context.Context, tenantID primitive.ObjectID) (uint64, error) {
+func (impl ShareableLinkStorerImpl) generatePublicID(ctx context.Context, tenantID primitive.ObjectID) (uint64, error) {
 	var publicID uint64
 	latest, err := impl.GetLatestByTenantID(ctx, tenantID)
 	if err != nil {

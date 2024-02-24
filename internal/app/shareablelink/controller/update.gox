@@ -9,12 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	sharablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
+	shareablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/config/constants"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
-type SharableLinkUpdateRequestIDO struct {
+type ShareableLinkUpdateRequestIDO struct {
 	ID          primitive.ObjectID `bson:"id" json:"id"`
 	Description string             `bson:"description" json:"description"`
 	Name        string             `bson:"name" json:"name"`
@@ -23,7 +23,7 @@ type SharableLinkUpdateRequestIDO struct {
 	SortNumber  int8               `bson:"sort_number" json:"sort_number"`
 }
 
-func (impl *SharableLinkControllerImpl) validateUpdateRequest(ctx context.Context, dirtyData *SharableLinkUpdateRequestIDO) error {
+func (impl *ShareableLinkControllerImpl) validateUpdateRequest(ctx context.Context, dirtyData *ShareableLinkUpdateRequestIDO) error {
 	e := make(map[string]string)
 
 	if dirtyData.Name == "" {
@@ -45,7 +45,7 @@ func (impl *SharableLinkControllerImpl) validateUpdateRequest(ctx context.Contex
 	return nil
 }
 
-func (impl *SharableLinkControllerImpl) UpdateByID(ctx context.Context, requestData *SharableLinkUpdateRequestIDO) (*sharablelink_s.SharableLink, error) {
+func (impl *ShareableLinkControllerImpl) UpdateByID(ctx context.Context, requestData *ShareableLinkUpdateRequestIDO) (*shareablelink_s.ShareableLink, error) {
 	//
 	// Perform our validation and return validation error on any issues detected.
 	//
@@ -91,14 +91,14 @@ func (impl *SharableLinkControllerImpl) UpdateByID(ctx context.Context, requestD
 		//// Get data.
 		////
 
-		// Lookup the sharablelink in our database, else return a `400 Bad Request` error.
-		hh, err := impl.SharableLinkStorer.GetByID(sessCtx, requestData.ID)
+		// Lookup the shareablelink in our database, else return a `400 Bad Request` error.
+		hh, err := impl.ShareableLinkStorer.GetByID(sessCtx, requestData.ID)
 		if err != nil {
 			impl.Logger.Error("database error", slog.Any("err", err))
 			return nil, err
 		}
 		if hh == nil {
-			impl.Logger.Warn("sharablelink does not exist validation error")
+			impl.Logger.Warn("shareablelink does not exist validation error")
 			return nil, httperror.NewForBadRequestWithSingleField("id", "does not exist")
 		}
 
@@ -120,8 +120,8 @@ func (impl *SharableLinkControllerImpl) UpdateByID(ctx context.Context, requestD
 		hh.SubCategory = requestData.SubCategory
 		hh.SortNumber = requestData.SortNumber
 
-		if err := impl.SharableLinkStorer.UpdateByID(sessCtx, hh); err != nil {
-			impl.Logger.Error("sharablelink update by id error", slog.Any("error", err))
+		if err := impl.ShareableLinkStorer.UpdateByID(sessCtx, hh); err != nil {
+			impl.Logger.Error("shareablelink update by id error", slog.Any("error", err))
 			return nil, err
 		}
 
@@ -146,5 +146,5 @@ func (impl *SharableLinkControllerImpl) UpdateByID(ctx context.Context, requestD
 		return nil, err
 	}
 
-	return result.(*sharablelink_s.SharableLink), nil
+	return result.(*shareablelink_s.ShareableLink), nil
 }

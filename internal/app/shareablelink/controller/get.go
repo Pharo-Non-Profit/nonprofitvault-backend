@@ -9,13 +9,13 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	sharablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
+	shareablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
-func (c *SharableLinkControllerImpl) GetByID(ctx context.Context, id primitive.ObjectID) (*sharablelink_s.SharableLink, error) {
+func (c *ShareableLinkControllerImpl) GetByID(ctx context.Context, id primitive.ObjectID) (*shareablelink_s.ShareableLink, error) {
 	// Retrieve from our database the record for the specific id.
-	m, err := c.SharableLinkStorer.GetByID(ctx, id)
+	m, err := c.ShareableLinkStorer.GetByID(ctx, id)
 	if err != nil {
 		c.Logger.Error("database get by id error", slog.Any("error", err))
 		return nil, err
@@ -23,7 +23,7 @@ func (c *SharableLinkControllerImpl) GetByID(ctx context.Context, id primitive.O
 	return m, err
 }
 
-type PublicSharableLinkResponseIDO struct {
+type PublicShareableLinkResponseIDO struct {
 	ExpiryDate             time.Time          `bson:"expiry_date" json:"expiry_date"`
 	ExpiresIn              uint64             `bson:"expires_in,omitempty" json:"expires_in,omitempty"`
 	SmartFolderID          primitive.ObjectID `bson:"smart_folder_id" json:"smart_folder_id"`
@@ -44,18 +44,18 @@ type PublicSharableLinkResponseIDO struct {
 	TenantName             string             `bson:"tenant_name" json:"tenant_name"`
 }
 
-func (c *SharableLinkControllerImpl) PublicGetByID(ctx context.Context, id primitive.ObjectID) (*PublicSharableLinkResponseIDO, error) {
+func (c *ShareableLinkControllerImpl) PublicGetByID(ctx context.Context, id primitive.ObjectID) (*PublicShareableLinkResponseIDO, error) {
 	// Retrieve from our database the record for the specific id.
-	sl, err := c.SharableLinkStorer.GetByID(ctx, id)
+	sl, err := c.ShareableLinkStorer.GetByID(ctx, id)
 	if err != nil {
-		c.Logger.Error("failed getting sharable link by id",
+		c.Logger.Error("failed getting shareable link by id",
 			slog.Any("error", err))
 		return nil, err
 	}
 	if sl == nil {
-		return nil, httperror.NewForBadRequestWithSingleField("id", fmt.Sprintf("sharable link does not exist for id: %s", id.Hex()))
+		return nil, httperror.NewForBadRequestWithSingleField("id", fmt.Sprintf("shareable link does not exist for id: %s", id.Hex()))
 	}
-	res := &PublicSharableLinkResponseIDO{
+	res := &PublicShareableLinkResponseIDO{
 		ExpiryDate:             sl.ExpiryDate,
 		ExpiresIn:              sl.ExpiresIn,
 		SmartFolderID:          sl.SmartFolderID,

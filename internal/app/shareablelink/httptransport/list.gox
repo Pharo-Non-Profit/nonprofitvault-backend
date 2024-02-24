@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"strconv"
 
-	sharablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/sharablelink/datastore"
+	shareablelink_s "github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/app/shareablelink/datastore"
 	"github.com/Pharo-Non-Profit/nonprofitvault-backend/internal/utils/httperror"
 )
 
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	f := &sharablelink_s.SharableLinkPaginationListFilter{
+	f := &shareablelink_s.ShareableLinkPaginationListFilter{
 		Cursor:    "",
 		PageSize:  25,
 		SortField: "sort_number",
@@ -64,7 +64,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	MarshalListResponse(m, w)
 }
 
-func MarshalListResponse(res *sharablelink_s.SharableLinkPaginationListResult, w http.ResponseWriter) {
+func MarshalListResponse(res *shareablelink_s.ShareableLinkPaginationListResult, w http.ResponseWriter) {
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

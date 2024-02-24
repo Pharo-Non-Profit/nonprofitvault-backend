@@ -10,10 +10,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (impl SharableLinkStorerImpl) GetByID(ctx context.Context, id primitive.ObjectID) (*SharableLink, error) {
+func (impl ShareableLinkStorerImpl) GetByID(ctx context.Context, id primitive.ObjectID) (*ShareableLink, error) {
 	filter := bson.D{{"_id", id}}
 
-	var result SharableLink
+	var result ShareableLink
 	err := impl.Collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -26,10 +26,10 @@ func (impl SharableLinkStorerImpl) GetByID(ctx context.Context, id primitive.Obj
 	return &result, nil
 }
 
-func (impl SharableLinkStorerImpl) GetByPublicID(ctx context.Context, oldID uint64) (*SharableLink, error) {
+func (impl ShareableLinkStorerImpl) GetByPublicID(ctx context.Context, oldID uint64) (*ShareableLink, error) {
 	filter := bson.D{{"public_id", oldID}}
 
-	var result SharableLink
+	var result ShareableLink
 	err := impl.Collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -42,10 +42,10 @@ func (impl SharableLinkStorerImpl) GetByPublicID(ctx context.Context, oldID uint
 	return &result, nil
 }
 
-func (impl SharableLinkStorerImpl) GetByText(ctx context.Context, text string) (*SharableLink, error) {
+func (impl ShareableLinkStorerImpl) GetByText(ctx context.Context, text string) (*ShareableLink, error) {
 	filter := bson.D{{"text", text}}
 
-	var result SharableLink
+	var result ShareableLink
 	err := impl.Collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -58,11 +58,11 @@ func (impl SharableLinkStorerImpl) GetByText(ctx context.Context, text string) (
 	return &result, nil
 }
 
-func (impl SharableLinkStorerImpl) GetLatestByTenantID(ctx context.Context, tenantID primitive.ObjectID) (*SharableLink, error) {
+func (impl ShareableLinkStorerImpl) GetLatestByTenantID(ctx context.Context, tenantID primitive.ObjectID) (*ShareableLink, error) {
 	filter := bson.D{{"tenant_id", tenantID}}
 	opts := options.Find().SetSort(bson.D{{"public_id", -1}}).SetLimit(1)
 
-	var order SharableLink
+	var order ShareableLink
 	cursor, err := impl.Collection.Find(context.Background(), filter, opts)
 	if err != nil {
 		return nil, err
