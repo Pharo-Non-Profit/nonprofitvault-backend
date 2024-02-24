@@ -41,6 +41,7 @@ func (impl *ShareableLinkControllerImpl) Create(ctx context.Context, req *Sharea
 	//
 
 	tid, _ := ctx.Value(constants.SessionUserTenantID).(primitive.ObjectID)
+	tn, _ := ctx.Value(constants.SessionUserTenantName).(string)
 	// role, _ := ctx.Value(constants.SessionUserRole).(int8)
 	userID, _ := ctx.Value(constants.SessionUserID).(primitive.ObjectID)
 	userName, _ := ctx.Value(constants.SessionUserName).(string)
@@ -105,6 +106,7 @@ func (impl *ShareableLinkControllerImpl) Create(ctx context.Context, req *Sharea
 
 		// Add defaults.
 		sl.TenantID = tid
+		sl.TenantName = tn
 		sl.ID = primitive.NewObjectID()
 		sl.CreatedAt = time.Now()
 		sl.CreatedByUserID = userID

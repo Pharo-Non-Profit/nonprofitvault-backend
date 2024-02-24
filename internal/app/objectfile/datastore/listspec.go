@@ -45,3 +45,36 @@ func (impl ObjectFileStorerImpl) ListObjectKeysBySmartFolderID(ctx context.Conte
 	// Return the list of object keys
 	return objectKeys, nil
 }
+
+func (impl ObjectFileStorerImpl) ListBySmartFolderID(ctx context.Context, sfid primitive.ObjectID) ([]*ObjectFile, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
+	defer cancel()
+
+	// Create the filter based on the smart_folder_id
+	filter := bson.M{"smart_folder_id": sfid}
+
+	// Find documents matching the filter
+	cursor, err := impl.Collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	// Iterate over the cursor and decode documents into ObjectFile structs
+	var objectFiles []*ObjectFile
+	for cursor.Next(ctx) {
+		var obj ObjectFile
+		if err := cursor.Decode(&obj); err != nil {
+			return nil, err
+		}
+		objectFiles = append(objectFiles, &obj)
+	}
+
+	// Check for any errors during cursor iteration
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	// Return the list of ObjectFile structs
+	return objectFiles, nil
+}
