@@ -309,6 +309,35 @@ func (mid *middleware) PostJWTProcessorMiddleware(fn http.HandlerFunc) http.Hand
 			// 	return
 			// }
 
+			// The following session verification code enforces the user submitted
+			// their 2FA code after login to get access to the session. If the
+			// user did not verify 2FA code then block their access.
+			if user.OTPEnabled && user.OTPVerified && !user.OTPValidated {
+				// Check the current URL, split it up and skip this 2FA code
+				// validation security if the user is making a call to the
+				// `/api/v1/otp/validate` API endpoint. Please note these
+				// URLs are dependent to what you are using in the server file.
+				urlSplit := ctx.Value("url_split").([]string)
+
+				// Check to see if the user is calling the `/api/v1/otp/validate`.
+				if len(urlSplit) > 3 && urlSplit[2] == "otp" && urlSplit[3] == "validate" {
+					// We skip validation so proceed in this function. Provide
+					// the following log for debugging purposes only.
+					mid.Logger.Debug("skipping session requires 2fa validation after login",
+						slog.Any("url_split", urlSplit),
+					)
+				} else {
+					// For debuggin purposes only.
+					mid.Logger.Warn("session requires 2fa validation after login",
+						slog.Any("url_split", urlSplit),
+					)
+
+					// Halt proceeding further.
+					http.Error(w, "attempting to access a protected endpoint without validating 2fa code after login", http.StatusForbidden)
+					return
+				}
+			}
+
 			// Save our user information to the context.
 			// Save our user.
 			ctx = context.WithValue(ctx, constants.SessionUser, user)
@@ -332,6 +361,7 @@ func (mid *middleware) PostJWTProcessorMiddleware(fn http.HandlerFunc) http.Hand
 			ctx = context.WithValue(ctx, constants.SessionUserLastName, user.LastName)
 			ctx = context.WithValue(ctx, constants.SessionUserTenantID, user.TenantID)
 			ctx = context.WithValue(ctx, constants.SessionUserTenantName, user.TenantName)
+			ctx = context.WithValue(ctx, constants.SessionUserOTPValidated, user.OTPValidated)
 		}
 
 		fn(w, r.WithContext(ctx))

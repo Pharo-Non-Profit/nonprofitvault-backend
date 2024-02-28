@@ -20,4 +20,5 @@ const (
 	SessionUserLastName
 	SessionUserTenantID
 	SessionUserTenantName
+	SessionUserOTPValidated
 )
